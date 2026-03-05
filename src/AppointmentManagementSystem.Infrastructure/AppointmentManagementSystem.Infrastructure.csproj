@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AppointmentManagementSystem.Application\AppointmentManagementSystem.Application.csproj" />
+    <ProjectReference Include="..\AppointmentManagementSystem.Domain\AppointmentManagementSystem.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

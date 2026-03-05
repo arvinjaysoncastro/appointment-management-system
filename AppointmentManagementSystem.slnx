@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="src/AppointmentManagementSystem.API/AppointmentManagementSystem.API.csproj" Id="4019130c-4b8d-46d7-84e8-f9a18356c522" />
+  <Project Path="src/AppointmentManagementSystem.Application/AppointmentManagementSystem.Application.csproj" Id="5f758b60-bbbb-46d5-aea5-de33b758da34" />
+  <Project Path="src/AppointmentManagementSystem.Domain/AppointmentManagementSystem.Domain.csproj" Id="567e35f4-e658-4ef3-8fab-48f8c64f50f2" />
+  <Project Path="src/AppointmentManagementSystem.Infrastructure/AppointmentManagementSystem.Infrastructure.csproj" Id="0734237a-3640-4ca1-b41d-5b95f6236f2c" />
+</Solution>
