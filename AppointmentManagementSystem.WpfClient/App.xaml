@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:AppointmentManagementSystem.WpfClient"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
-         
+        <!-- Converters for data binding -->
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <local:InvertBooleanToVisibilityConverter x:Key="InvertBoolToVisibilityConverter"/>
     </Application.Resources>
 </Application>
