@@ -1,5 +1,5 @@
-using AppointmentManagementSystem.Application.Interfaces;
 using AppointmentManagementSystem.Application.Services;
+using AppointmentManagementSystem.API.Configuration;
 using AppointmentManagementSystem.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +17,9 @@ builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Exception handling middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // OpenAPI
 if (app.Environment.IsDevelopment())
