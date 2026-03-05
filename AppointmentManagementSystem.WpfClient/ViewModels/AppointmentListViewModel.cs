@@ -1,14 +1,17 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
+using AppointmentManagementSystem.WpfClient.Services;
 
 namespace AppointmentManagementSystem.WpfClient.ViewModels
 {
     /// <summary>
     /// ViewModel for displaying and managing the list of appointments.
+    /// Receives AppointmentApiClient via constructor injection.
     /// </summary>
     public class AppointmentListViewModel : ViewModelBase
     {
+        private readonly IAppointmentApiClient _appointmentApiClient;
         private ObservableCollection<AppointmentItemViewModel> _appointments;
         private bool _isLoading;
 
@@ -27,20 +30,28 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         public ICommand LoadAppointmentsCommand { get; }
         public ICommand AddAppointmentCommand { get; }
 
-        public AppointmentListViewModel()
+        public AppointmentListViewModel(IAppointmentApiClient appointmentApiClient)
         {
+            _appointmentApiClient = appointmentApiClient ?? throw new System.ArgumentNullException(nameof(appointmentApiClient));
             Appointments = new ObservableCollection<AppointmentItemViewModel>();
             LoadAppointmentsCommand = new RelayCommand(_ => LoadAppointments());
             AddAppointmentCommand = new RelayCommand(_ => AddAppointment());
         }
 
-        private void LoadAppointments()
+        private async void LoadAppointments()
         {
-            // TODO: Call AppointmentService to fetch appointments from API
-            // For now, scaffold only - no API calls
+            // TODO: Call AppointmentApiClient to fetch appointments from API
+            // Scaffold only - no API calls implemented yet
             IsLoading = true;
-            // Implementation deferred
-            IsLoading = false;
+            try
+            {
+                // var response = await _appointmentApiClient.GetAppointmentsAsync(DateTime.Now);
+                // MapToViewModels(response);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         private void AddAppointment()
