@@ -37,6 +37,8 @@ public sealed class Appointment
         CreatedAt = DateTimeOffset.UtcNow;
     }
 
+    private Appointment() { }
+
     public void SetTitle(string title)
     {
         if (string.IsNullOrWhiteSpace(title))

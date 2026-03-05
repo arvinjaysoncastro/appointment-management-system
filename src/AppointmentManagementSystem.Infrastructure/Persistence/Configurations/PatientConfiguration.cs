@@ -1,4 +1,5 @@
 using AppointmentManagementSystem.Domain.Entities;
+using AppointmentManagementSystem.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,6 +21,9 @@ public sealed class PatientConfiguration : IEntityTypeConfiguration<Patient>
 
         builder.Property(p => p.CreatedAt)
             .IsRequired();
+
+        builder.OwnsMany(p => p.Contacts)
+            .ToTable("PatientContacts");
 
         builder.HasMany(p => p.Notes)
             .WithOne()

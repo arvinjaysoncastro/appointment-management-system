@@ -15,5 +15,7 @@ public sealed class ClinicHoliday
         Date = date;
         Name = name.Trim();
     }
+
+    private ClinicHoliday() { }
 }
 

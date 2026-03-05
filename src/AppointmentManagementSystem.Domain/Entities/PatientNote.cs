@@ -29,5 +29,7 @@ public sealed class PatientNote
         Text = text.Trim();
         CreatedAt = DateTimeOffset.UtcNow;
     }
+
+    private PatientNote() { }
 }
 

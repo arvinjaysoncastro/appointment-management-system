@@ -30,6 +30,8 @@ public sealed class Patient
         CreatedAt = DateTimeOffset.UtcNow;
     }
 
+    private Patient() { }
+
     public void SetName(string firstName, string lastName)
     {
         if (string.IsNullOrWhiteSpace(firstName))

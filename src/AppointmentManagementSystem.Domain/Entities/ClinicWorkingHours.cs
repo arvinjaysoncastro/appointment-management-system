@@ -18,6 +18,8 @@ public sealed class ClinicWorkingHours
         CloseTime = closeTime;
     }
 
+    private ClinicWorkingHours() { }
+
     public bool Contains(DateTimeOffset dateTime)
     {
         if (dateTime.DayOfWeek != DayOfWeek)

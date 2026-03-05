@@ -22,5 +22,7 @@ public sealed record PatientContact
         Type = type;
         Value = value.Trim();
     }
+
+    private PatientContact() { }
 }
 

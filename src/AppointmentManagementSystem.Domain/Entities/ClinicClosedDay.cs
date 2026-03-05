@@ -8,5 +8,7 @@ public sealed class ClinicClosedDay
     {
         DayOfWeek = dayOfWeek;
     }
+
+    private ClinicClosedDay() { }
 }
 
