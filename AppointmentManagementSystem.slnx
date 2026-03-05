@@ -5,6 +5,7 @@
     <File Path="LICENSE" />
     <File Path="README.md" />
   </Folder>
+  <Project Path="AppointmentManagementSystem.WpfClient/AppointmentManagementSystem.WpfClient.csproj" Id="e26e6199-b451-4915-998d-8b9c441650d6" />
   <Project Path="src/AppointmentManagementSystem.API/AppointmentManagementSystem.API.csproj" Id="4019130c-4b8d-46d7-84e8-f9a18356c522" />
   <Project Path="src/AppointmentManagementSystem.Application/AppointmentManagementSystem.Application.csproj" Id="5f758b60-bbbb-46d5-aea5-de33b758da34" />
   <Project Path="src/AppointmentManagementSystem.Domain/AppointmentManagementSystem.Domain.csproj" Id="567e35f4-e658-4ef3-8fab-48f8c64f50f2" />
