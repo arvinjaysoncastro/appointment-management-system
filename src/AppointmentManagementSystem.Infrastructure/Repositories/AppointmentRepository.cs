@@ -22,12 +22,13 @@ public sealed class AppointmentRepository : IAppointmentRepository
 
     public async Task<IReadOnlyList<AppointmentSummaryDto>> SearchAsync(DateTimeOffset date, CancellationToken cancellationToken)
     {
-        // used to return lightweight metadata for list views
-        var targetDate = date.Date;
+        var start = date.Date;
+        var end = start.AddDays(1);
 
         var query = from a in _dbContext.Appointments.AsNoTracking()
                     join p in _dbContext.Patients.AsNoTracking() on a.PatientId equals p.Id
-                    where a.StartTime.Date == targetDate
+                    where a.StartTime >= start && a.StartTime < end
+                    orderby a.StartTime
                     select new AppointmentSummaryDto
                     {
                         Id = a.Id,
