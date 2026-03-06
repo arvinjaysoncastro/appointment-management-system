@@ -6,8 +6,61 @@
         xmlns:local="clr-namespace:AppointmentManagementSystem.WpfClient"
         xmlns:views="clr-namespace:AppointmentManagementSystem.WpfClient.Views"
         mc:Ignorable="d"
-        Title="Appointment Management System" Height="450" Width="800">
+        Title="Appointment Management System" Height="700" Width="1200" WindowStartupLocation="CenterScreen">
     <Grid>
-        <views:AppointmentListView/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Sidebar Navigation -->
+        <StackPanel Grid.Column="0" Background="#2C2F3A" Orientation="Vertical">
+            <!-- Sidebar Header -->
+            <TextBlock
+                Text="Latus Appointment"
+                Foreground="White"
+                FontSize="18"
+                FontWeight="Bold"
+                Margin="20,20,20,30"
+                TextWrapping="Wrap"/>
+
+            <!-- Navigation Buttons -->
+            <Button 
+                Command="{Binding ShowAppointmentsCommand}"
+                Content="Appointments" 
+                Margin="10"
+                Padding="15,12"
+                Background="#3D4050"
+                Foreground="White"
+                FontSize="14"
+                BorderThickness="0"
+                Cursor="Hand"/>
+            
+            <Button 
+                Command="{Binding ShowPeopleCommand}"
+                Content="People" 
+                Margin="10"
+                Padding="15,12"
+                Background="#3D4050"
+                Foreground="White"
+                FontSize="14"
+                BorderThickness="0"
+                Cursor="Hand"/>
+            
+            <Button 
+                Command="{Binding ShowSettingsCommand}"
+                Content="Settings" 
+                Margin="10"
+                Padding="15,12"
+                Background="#3D4050"
+                Foreground="White"
+                FontSize="14"
+                BorderThickness="0"
+                Cursor="Hand"/>
+        </StackPanel>
+
+        <!-- Main Content Area -->
+        <ContentControl Grid.Column="1"
+                        Content="{Binding CurrentView}"/>
     </Grid>
 </Window>

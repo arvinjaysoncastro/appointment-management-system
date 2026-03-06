@@ -161,10 +161,17 @@ namespace AppointmentManagementSystem.WpfClient
                 return new AppointmentListViewModel(apiClient, createViewModel);
             });
 
+            // Register MainWindowViewModel (singleton - created once via DI)
+            services.AddSingleton<MainWindowViewModel>(provider =>
+            {
+                var appointmentListViewModel = provider.GetRequiredService<AppointmentListViewModel>();
+                return new MainWindowViewModel(appointmentListViewModel);
+            });
+
             // Register MainWindow as singleton (created once via DI)
             services.AddSingleton<MainWindow>(provider =>
             {
-                var viewModel = provider.GetRequiredService<AppointmentListViewModel>();
+                var viewModel = provider.GetRequiredService<MainWindowViewModel>();
                 return new MainWindow(viewModel);
             });
         }

@@ -55,10 +55,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="Views\PeopleView.xaml.cs">
+      <DependentUpon>PeopleView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
     <Page Include="Views\AppointmentCreateView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AppointmentListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AppointmentsView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\MainWindow.xaml">
@@ -74,20 +84,32 @@
     <Compile Include="Infrastructure\ViewModelBase.cs" />
     <Compile Include="InvertBooleanToVisibilityConverter.cs" />
     <Compile Include="Models\PatientOption.cs" />
+    <Compile Include="Models\Person.cs" />
     <Compile Include="Services\AppointmentApiClient.cs" />
     <Compile Include="StringToVisibilityConverter.cs" />
     <Compile Include="ViewModels\AppointmentCreateViewModel.cs" />
     <Compile Include="ViewModels\AppointmentListViewModel.cs" />
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\PeopleViewModel.cs" />
     <Compile Include="Views\AppointmentCreateView.xaml.cs">
       <DependentUpon>AppointmentCreateView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\AppointmentListView.xaml.cs">
       <DependentUpon>AppointmentListView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\AppointmentsView.xaml.cs">
+      <DependentUpon>AppointmentsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\PeopleView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

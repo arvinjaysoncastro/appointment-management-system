@@ -1,0 +1,111 @@
+<UserControl x:Class="AppointmentManagementSystem.WpfClient.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="900">
+    <Grid Background="White">
+        <StackPanel Margin="40" VerticalAlignment="Top">
+            
+            <!-- Page Header -->
+            <TextBlock Text="Clinic Settings"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="#333333"
+                       Margin="0,0,0,30"/>
+
+            <!-- Working Hours Section -->
+            <TextBlock Text="Clinic Working Hours"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       Foreground="#555555"
+                       Margin="0,0,0,15"/>
+
+            <!-- Start Time -->
+            <Grid Margin="20,0,0,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="200"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="Start Time:"
+                           VerticalAlignment="Center"
+                           Margin="0,0,20,0"/>
+                <TextBox Grid.Column="1"
+                         Text="{Binding StartTime, UpdateSourceTrigger=PropertyChanged}"
+                         Padding="8"
+                         Height="35"
+                         FontSize="12"/>
+            </Grid>
+
+            <!-- End Time -->
+            <Grid Margin="20,0,0,30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="200"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="End Time:"
+                           VerticalAlignment="Center"
+                           Margin="0,0,20,0"/>
+                <TextBox Grid.Column="1"
+                         Text="{Binding EndTime, UpdateSourceTrigger=PropertyChanged}"
+                         Padding="8"
+                         Height="35"
+                         FontSize="12"/>
+            </Grid>
+
+            <!-- Closed Day Section -->
+            <TextBlock Text="Closed Day"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       Foreground="#555555"
+                       Margin="0,0,0,15"/>
+
+            <Grid Margin="20,0,0,30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="200"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="Day:"
+                           VerticalAlignment="Center"
+                           Margin="0,0,20,0"/>
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding DaysOfWeek}"
+                          SelectedItem="{Binding ClosedDay, Mode=TwoWay}"
+                          Padding="8"
+                          Height="35"
+                          FontSize="12"/>
+            </Grid>
+
+            <!-- Holiday Dates Section -->
+            <TextBlock Text="Holiday Dates"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       Foreground="#555555"
+                       Margin="0,0,0,15"/>
+
+            <TextBox Margin="20,0,0,15"
+                     Text="{Binding HolidayDates, UpdateSourceTrigger=PropertyChanged}"
+                     Padding="10"
+                     Height="80"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     FontSize="12"
+                     Foreground="#666666"/>
+
+            <!-- Info Message -->
+            <TextBlock Text="Note: Settings are not persisted. This is a placeholder UI for demonstration purposes."
+                       FontSize="11"
+                       Foreground="#999999"
+                       Margin="0,20,0,0"
+                       TextWrapping="Wrap"
+                       FontStyle="Italic"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

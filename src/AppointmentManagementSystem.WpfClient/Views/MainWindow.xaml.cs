@@ -11,7 +11,7 @@ namespace AppointmentManagementSystem.WpfClient
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow(AppointmentListViewModel viewModel)
+        public MainWindow(MainWindowViewModel viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;
