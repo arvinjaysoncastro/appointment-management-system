@@ -14,6 +14,7 @@ namespace AppointmentManagementSystem.WpfClient.Services
     {
         Task<List<AppointmentSummaryDto>> GetAppointmentsAsync(DateTime date);
         Task<AppointmentDetailsDto> CreateAppointmentAsync(CreateAppointmentDto dto);
+        Task DeleteAppointmentAsync(Guid id);
     }
 
     public class AppointmentApiClient : IAppointmentApiClient
@@ -75,6 +76,24 @@ namespace AppointmentManagementSystem.WpfClient.Services
             catch (Exception ex)
             {
                 throw new InvalidOperationException($"Error creating appointment: {ex.Message}", ex);
+            }
+        }
+
+        public async Task DeleteAppointmentAsync(Guid id)
+        {
+            try
+            {
+                var url = $"{BaseUrl}/{id}";
+                var response = await _httpClient.DeleteAsync(url);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new InvalidOperationException($"Failed to delete appointment: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Error deleting appointment: {ex.Message}", ex);
             }
         }
     }

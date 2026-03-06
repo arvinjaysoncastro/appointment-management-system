@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
 using AppointmentManagementSystem.WpfClient.Services;
@@ -17,6 +18,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private readonly IAppointmentApiClient _appointmentApiClient;
         private readonly AppointmentCreateViewModel _createViewModel;
         private ObservableCollection<AppointmentItemViewModel> _appointments;
+        private AppointmentItemViewModel _selectedAppointment;
         private bool _isLoading;
         private string _errorMessage;
 
@@ -24,6 +26,12 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         {
             get => _appointments;
             set => SetProperty(ref _appointments, value);
+        }
+
+        public AppointmentItemViewModel SelectedAppointment
+        {
+            get => _selectedAppointment;
+            set => SetProperty(ref _selectedAppointment, value);
         }
 
         public bool IsLoading
@@ -40,6 +48,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
 
         public ICommand LoadAppointmentsCommand { get; }
         public ICommand AddAppointmentCommand { get; }
+        public ICommand DeleteAppointmentCommand { get; }
 
         public AppointmentListViewModel(IAppointmentApiClient appointmentApiClient, AppointmentCreateViewModel createViewModel)
         {
@@ -48,6 +57,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             Appointments = new ObservableCollection<AppointmentItemViewModel>();
             LoadAppointmentsCommand = new AsyncRelayCommand(LoadAppointmentsAsync);
             AddAppointmentCommand = new RelayCommand(_ => ShowCreateAppointmentDialog());
+            DeleteAppointmentCommand = new AsyncRelayCommand(DeleteSelectedAppointmentAsync, CanDeleteAppointment);
         }
 
         private async System.Threading.Tasks.Task LoadAppointmentsAsync()
@@ -103,6 +113,47 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             {
                 // Refresh appointments list
                 _ = LoadAppointmentsAsync();
+            }
+        }
+
+        private bool CanDeleteAppointment()
+        {
+            return SelectedAppointment != null && !IsLoading;
+        }
+
+        private async System.Threading.Tasks.Task DeleteSelectedAppointmentAsync()
+        {
+            if (SelectedAppointment == null)
+                return;
+
+            // Confirm deletion
+            var result = MessageBox.Show(
+                $"Are you sure you want to delete the appointment '{SelectedAppointment.Title}' for {SelectedAppointment.PatientName}?",
+                "Confirm Delete",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            IsLoading = true;
+            ErrorMessage = string.Empty;
+
+            try
+            {
+                await _appointmentApiClient.DeleteAppointmentAsync(SelectedAppointment.Id);
+                
+                // Remove from collection
+                Appointments.Remove(SelectedAppointment);
+                SelectedAppointment = null;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Error deleting appointment: {ex.Message}";
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
     }
