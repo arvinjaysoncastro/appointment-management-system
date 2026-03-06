@@ -1,5 +1,5 @@
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -8,10 +8,11 @@ namespace AppointmentManagementSystem.WpfClient.Services
     /// <summary>
     /// HTTP client for communicating with the Appointment API.
     /// Abstracts API communication from ViewModels.
+    /// All IO is asynchronous.
     /// </summary>
     public interface IAppointmentApiClient
     {
-        Task<AppointmentListResponse> GetAppointmentsAsync(DateTime date);
+        Task<List<AppointmentSummaryDto>> GetAppointmentsAsync(DateTime date);
     }
 
     public class AppointmentApiClient : IAppointmentApiClient
@@ -24,7 +25,7 @@ namespace AppointmentManagementSystem.WpfClient.Services
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        public async Task<AppointmentListResponse> GetAppointmentsAsync(DateTime date)
+        public async Task<List<AppointmentSummaryDto>> GetAppointmentsAsync(DateTime date)
         {
             try
             {
@@ -32,36 +33,33 @@ namespace AppointmentManagementSystem.WpfClient.Services
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
-                // TODO: Deserialize response using System.Text.Json or Newtonsoft.Json
-                // For now, scaffold only - no API calls implemented
-                return new AppointmentListResponse
-                {
-                    Appointments = new ObservableCollection<AppointmentDto>()
-                };
+                var content = await response.Content.ReadAsStringAsync();
+                
+                // TODO: Implement proper JSON deserialization
+                // For now, return empty list. Can use DataContractJsonSerializer or HttpClient.GetFromJsonAsync
+                return new List<AppointmentSummaryDto>();
             }
             catch (HttpRequestException ex)
             {
-                throw new InvalidOperationException("Failed to fetch appointments from API", ex);
+                throw new InvalidOperationException($"Failed to fetch appointments from API: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Error deserializing API response: {ex.Message}", ex);
             }
         }
     }
 
     /// <summary>
-    /// DTO for API responses
+    /// DTO matching API AppointmentSummaryDto
     /// </summary>
-    public class AppointmentDto
+    public class AppointmentSummaryDto
     {
         public Guid Id { get; set; }
         public Guid PatientId { get; set; }
-        public string PatientName { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public string Title { get; set; }
-    }
-
-    public class AppointmentListResponse
-    {
-        public ObservableCollection<AppointmentDto> Appointments { get; set; }
-            = new ObservableCollection<AppointmentDto>();
+        public string PatientName { get; set; } = string.Empty;
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
+        public string Title { get; set; } = string.Empty;
     }
 }

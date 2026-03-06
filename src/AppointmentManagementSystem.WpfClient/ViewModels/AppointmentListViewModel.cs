@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
@@ -8,12 +9,14 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
     /// <summary>
     /// ViewModel for displaying and managing the list of appointments.
     /// Receives AppointmentApiClient via constructor injection.
+    /// No business logic - only orchestrates service calls and updates UI state.
     /// </summary>
     public class AppointmentListViewModel : ViewModelBase
     {
         private readonly IAppointmentApiClient _appointmentApiClient;
         private ObservableCollection<AppointmentItemViewModel> _appointments;
         private bool _isLoading;
+        private string _errorMessage;
 
         public ObservableCollection<AppointmentItemViewModel> Appointments
         {
@@ -27,26 +30,50 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             set => SetProperty(ref _isLoading, value);
         }
 
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set => SetProperty(ref _errorMessage, value);
+        }
+
         public ICommand LoadAppointmentsCommand { get; }
         public ICommand AddAppointmentCommand { get; }
 
         public AppointmentListViewModel(IAppointmentApiClient appointmentApiClient)
         {
-            _appointmentApiClient = appointmentApiClient ?? throw new System.ArgumentNullException(nameof(appointmentApiClient));
+            _appointmentApiClient = appointmentApiClient ?? throw new ArgumentNullException(nameof(appointmentApiClient));
             Appointments = new ObservableCollection<AppointmentItemViewModel>();
-            LoadAppointmentsCommand = new RelayCommand(_ => LoadAppointments());
+            LoadAppointmentsCommand = new AsyncRelayCommand(LoadAppointmentsAsync);
             AddAppointmentCommand = new RelayCommand(_ => AddAppointment());
         }
 
-        private async void LoadAppointments()
+        private async System.Threading.Tasks.Task LoadAppointmentsAsync()
         {
-            // TODO: Call AppointmentApiClient to fetch appointments from API
-            // Scaffold only - no API calls implemented yet
             IsLoading = true;
+            ErrorMessage = string.Empty;
+
             try
             {
-                // var response = await _appointmentApiClient.GetAppointmentsAsync(DateTime.Now);
-                // MapToViewModels(response);
+                var appointments = await _appointmentApiClient.GetAppointmentsAsync(DateTime.Now.Date);
+                
+                // Clear and repopulate collection
+                Appointments.Clear();
+                foreach (var appointment in appointments)
+                {
+                    Appointments.Add(new AppointmentItemViewModel
+                    {
+                        Id = appointment.Id,
+                        PatientId = appointment.PatientId,
+                        PatientName = appointment.PatientName,
+                        StartTime = appointment.StartTime,
+                        EndTime = appointment.EndTime,
+                        Title = appointment.Title
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Error loading appointments: {ex.Message}";
             }
             finally
             {
@@ -66,15 +93,23 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
     /// </summary>
     public class AppointmentItemViewModel : ViewModelBase
     {
-        private int _id;
+        private Guid _id;
+        private Guid _patientId;
         private string _patientName;
-        private string _appointmentTime;
-        private string _status;
+        private DateTimeOffset _startTime;
+        private DateTimeOffset _endTime;
+        private string _title;
 
-        public int Id
+        public Guid Id
         {
             get => _id;
             set => SetProperty(ref _id, value);
+        }
+
+        public Guid PatientId
+        {
+            get => _patientId;
+            set => SetProperty(ref _patientId, value);
         }
 
         public string PatientName
@@ -83,16 +118,22 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             set => SetProperty(ref _patientName, value);
         }
 
-        public string AppointmentTime
+        public DateTimeOffset StartTime
         {
-            get => _appointmentTime;
-            set => SetProperty(ref _appointmentTime, value);
+            get => _startTime;
+            set => SetProperty(ref _startTime, value);
         }
 
-        public string Status
+        public DateTimeOffset EndTime
         {
-            get => _status;
-            set => SetProperty(ref _status, value);
+            get => _endTime;
+            set => SetProperty(ref _endTime, value);
+        }
+
+        public string Title
+        {
+            get => _title;
+            set => SetProperty(ref _title, value);
         }
     }
 }

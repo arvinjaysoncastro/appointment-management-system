@@ -9,13 +9,14 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Toolbar -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10" Height="40">
             <Button Command="{Binding LoadAppointmentsCommand}" 
                     Padding="10,5" 
-                    Content="Refresh"/>
+                    Content="Load Appointments"/>
             <Button Command="{Binding AddAppointmentCommand}" 
                     Padding="10,5" 
                     Margin="10,0,0,0"
@@ -23,23 +24,53 @@
         </StackPanel>
 
         <!-- Loading Indicator -->
-        <TextBlock Grid.Row="1" 
-                   Text="Loading..." 
-                   Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center"/>
+        <StackPanel Grid.Row="1"
+                    Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+            <TextBlock Text="Loading appointments..." 
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,10"/>
+        </StackPanel>
 
-        <!-- Appointments List -->
+        <!-- Appointments DataGrid -->
         <DataGrid Grid.Row="1" 
                   ItemsSource="{Binding Appointments}"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
-                  Visibility="{Binding IsLoading, Converter={StaticResource InvertBoolToVisibilityConverter}}">
+                  CanUserDeleteRows="False"
+                  Visibility="{Binding IsLoading, Converter={StaticResource InvertBoolToVisibilityConverter}}"
+                  Margin="10">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Patient Name" Binding="{Binding PatientName}" Width="*"/>
-                <DataGridTextColumn Header="Appointment Time" Binding="{Binding AppointmentTime}" Width="200"/>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                <DataGridTextColumn Header="Id" 
+                                    Binding="{Binding Id}" 
+                                    Width="200"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Patient Name" 
+                                    Binding="{Binding PatientName}" 
+                                    Width="150"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Title" 
+                                    Binding="{Binding Title}" 
+                                    Width="120"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Start Time" 
+                                    Binding="{Binding StartTime, StringFormat='g'}" 
+                                    Width="180"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="End Time" 
+                                    Binding="{Binding EndTime, StringFormat='g'}" 
+                                    Width="180"
+                                    IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
+
+        <!-- Error Message -->
+        <TextBlock Grid.Row="2"
+                   Text="{Binding ErrorMessage}"
+                   Foreground="Red"
+                   Margin="10"
+                   TextWrapping="Wrap"
+                   Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
     </Grid>
 </UserControl>

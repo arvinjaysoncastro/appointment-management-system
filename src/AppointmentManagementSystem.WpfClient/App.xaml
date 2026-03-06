@@ -6,5 +6,6 @@
         <!-- Converters for data binding -->
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <local:InvertBooleanToVisibilityConverter x:Key="InvertBoolToVisibilityConverter"/>
+        <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
     </Application.Resources>
 </Application>

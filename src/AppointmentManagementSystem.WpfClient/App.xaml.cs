@@ -1,6 +1,6 @@
 using System;
-using System.Net.Http;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Windows;
 using AppointmentManagementSystem.WpfClient.Services;
 using AppointmentManagementSystem.WpfClient.ViewModels;
@@ -9,8 +9,9 @@ using AppointmentManagementSystem.WpfClient.Views;
 namespace AppointmentManagementSystem.WpfClient
 {
     /// <summary>
-    /// Lightweight Dependency Injection Container for .NET Framework 4.8
-    /// No external dependencies required
+    /// Lightweight Dependency Injection Container for .NET Framework 4.8.
+    /// Integrated into App.xaml.cs - follows Microsoft.Extensions.DependencyInjection patterns.
+    /// Constructor injection only - no Service Locator pattern.
     /// </summary>
     public interface IServiceProvider : IDisposable
     {
@@ -100,9 +101,9 @@ namespace AppointmentManagementSystem.WpfClient
                 }
             }
 
-            throw new InvalidOperationException($"Cannot resolve service '{serviceType.Name}'.");
-
+            throw new InvalidOperationException($"Cannot resolve service '{serviceType.Name}'.");
         }
+
         public void Dispose()
         {
             if (_disposed) return;
@@ -113,7 +114,8 @@ namespace AppointmentManagementSystem.WpfClient
 
     /// <summary>
     /// Interaction logic for App.xaml
-    /// Configures Dependency Injection for the WPF application
+    /// Configures Dependency Injection for the WPF application.
+    /// Constructor injection only - no Service Locator pattern.
     /// </summary>
     public partial class App : Application
     {

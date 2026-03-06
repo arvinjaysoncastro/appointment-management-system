@@ -69,6 +69,7 @@
     <Compile Include="Infrastructure\ViewModelBase.cs" />
     <Compile Include="InvertBooleanToVisibilityConverter.cs" />
     <Compile Include="Services\AppointmentApiClient.cs" />
+    <Compile Include="StringToVisibilityConverter.cs" />
     <Compile Include="ViewModels\AppointmentListViewModel.cs" />
     <Compile Include="Views\AppointmentListView.xaml.cs">
       <DependentUpon>AppointmentListView.xaml</DependentUpon>
