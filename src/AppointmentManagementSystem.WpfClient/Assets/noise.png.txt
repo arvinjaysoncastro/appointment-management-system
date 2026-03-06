@@ -1,0 +1,8 @@
+PNG
+
+The noise.png file should be a simple grayscale noise texture image.
+For a complete implementation, you would add this as a binary PNG file.
+For now, we'll reference it and it can be added later.
+
+This is a placeholder for the noise texture asset.
+Build Action should be set to "Resource" in project properties.

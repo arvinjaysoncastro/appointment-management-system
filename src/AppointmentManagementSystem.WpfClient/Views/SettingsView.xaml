@@ -12,14 +12,14 @@
             <TextBlock Text="Clinic Settings"
                        FontSize="24"
                        FontWeight="Bold"
-                       Foreground="#333333"
+                       Foreground="Black"
                        Margin="0,0,0,30"/>
 
             <!-- Working Hours Section -->
             <TextBlock Text="Clinic Working Hours"
                        FontSize="16"
                        FontWeight="SemiBold"
-                       Foreground="#555555"
+                       Foreground="#6B7280"
                        Margin="0,0,0,15"/>
 
             <!-- Start Time -->
@@ -32,12 +32,14 @@
                 <TextBlock Grid.Column="0"
                            Text="Start Time:"
                            VerticalAlignment="Center"
-                           Margin="0,0,20,0"/>
+                           Margin="0,0,20,0"
+                           Foreground="Black"/>
                 <TextBox Grid.Column="1"
                          Text="{Binding StartTime, UpdateSourceTrigger=PropertyChanged}"
                          Padding="8"
                          Height="35"
                          FontSize="12"/>
+
             </Grid>
 
             <!-- End Time -->
@@ -50,19 +52,21 @@
                 <TextBlock Grid.Column="0"
                            Text="End Time:"
                            VerticalAlignment="Center"
-                           Margin="0,0,20,0"/>
+                           Margin="0,0,20,0"
+                           Foreground="Black"/>
                 <TextBox Grid.Column="1"
                          Text="{Binding EndTime, UpdateSourceTrigger=PropertyChanged}"
                          Padding="8"
                          Height="35"
                          FontSize="12"/>
+
             </Grid>
 
             <!-- Closed Day Section -->
             <TextBlock Text="Closed Day"
                        FontSize="16"
                        FontWeight="SemiBold"
-                       Foreground="#555555"
+                       Foreground="#6B7280"
                        Margin="0,0,0,15"/>
 
             <Grid Margin="20,0,0,30">
@@ -74,20 +78,22 @@
                 <TextBlock Grid.Column="0"
                            Text="Day:"
                            VerticalAlignment="Center"
-                           Margin="0,0,20,0"/>
+                           Margin="0,0,20,0"
+                           Foreground="Black"/>
                 <ComboBox Grid.Column="1"
                           ItemsSource="{Binding DaysOfWeek}"
                           SelectedItem="{Binding ClosedDay, Mode=TwoWay}"
                           Padding="8"
                           Height="35"
                           FontSize="12"/>
+
             </Grid>
 
             <!-- Holiday Dates Section -->
             <TextBlock Text="Holiday Dates"
                        FontSize="16"
                        FontWeight="SemiBold"
-                       Foreground="#555555"
+                       Foreground="#6B7280"
                        Margin="0,0,0,15"/>
 
             <TextBox Margin="20,0,0,15"
@@ -96,13 +102,12 @@
                      Height="80"
                      TextWrapping="Wrap"
                      VerticalScrollBarVisibility="Auto"
-                     FontSize="12"
-                     Foreground="#666666"/>
+                     FontSize="12"/>
 
             <!-- Info Message -->
             <TextBlock Text="Note: Settings are not persisted. This is a placeholder UI for demonstration purposes."
                        FontSize="11"
-                       Foreground="#999999"
+                       Foreground="#9CA3AF"
                        Margin="0,20,0,0"
                        TextWrapping="Wrap"
                        FontStyle="Italic"/>

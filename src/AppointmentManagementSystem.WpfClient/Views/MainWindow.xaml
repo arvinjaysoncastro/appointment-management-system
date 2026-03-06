@@ -6,61 +6,84 @@
         xmlns:local="clr-namespace:AppointmentManagementSystem.WpfClient"
         xmlns:views="clr-namespace:AppointmentManagementSystem.WpfClient.Views"
         mc:Ignorable="d"
-        Title="Appointment Management System" Height="700" Width="1200" WindowStartupLocation="CenterScreen">
-    <Grid>
+        Title="Appointment Management System" Height="700" Width="1200" WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ResizeMode="NoResize">
+    <Grid Background="{StaticResource AppBackground}" MouseDown="WindowDrag">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="220"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Left Sidebar Navigation -->
-        <StackPanel Grid.Column="0" Background="#2C2F3A" Orientation="Vertical">
-            <!-- Sidebar Header -->
-            <TextBlock
-                Text="Latus Appointment"
+        <!-- Sidebar Container with Gradient and Noise -->
+        <Grid Grid.Column="0">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#1B1E24" Offset="0"/>
+                    <GradientStop Color="#111318" Offset="1"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <!-- Noise Overlay -->
+            <Rectangle Opacity="0.05">
+                <Rectangle.Fill>
+                    <ImageBrush ImageSource="pack://application:,,,/Assets/noise.png"
+                                TileMode="Tile"
+                                Viewport="0,0,100,100"
+                                ViewportUnits="Absolute"/>
+                </Rectangle.Fill>
+            </Rectangle>
+
+            <!-- Sidebar Content -->
+            <StackPanel Margin="20" Orientation="Vertical">
+                <!-- Sidebar Header -->
+                <TextBlock
+                    Text="Latus Appointment"
+                    Foreground="White"
+                    FontSize="18"
+                    FontWeight="Bold"
+                    Margin="0,10,0,30"/>
+
+                <!-- Navigation Buttons -->
+                <Button 
+                    Command="{Binding ShowAppointmentsCommand}"
+                    Content="Appointments" 
+                    Style="{StaticResource SidebarButtonStyle}"/>
+                
+                <Button 
+                    Command="{Binding ShowPeopleCommand}"
+                    Content="People" 
+                    Style="{StaticResource SidebarButtonStyle}"/>
+                
+                <Button 
+                    Command="{Binding ShowSettingsCommand}"
+                    Content="Settings" 
+                    Style="{StaticResource SidebarButtonStyle}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Custom Close Button (Top Right) -->
+        <Button Grid.Column="1"
+                Content="✕"
+                Width="40"
+                Height="40"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,0,10,0"
+                Background="#FF5252"
                 Foreground="White"
                 FontSize="18"
                 FontWeight="Bold"
-                Margin="20,20,20,30"
-                TextWrapping="Wrap"/>
-
-            <!-- Navigation Buttons -->
-            <Button 
-                Command="{Binding ShowAppointmentsCommand}"
-                Content="Appointments" 
-                Margin="10"
-                Padding="15,12"
-                Background="#3D4050"
-                Foreground="White"
-                FontSize="14"
                 BorderThickness="0"
-                Cursor="Hand"/>
-            
-            <Button 
-                Command="{Binding ShowPeopleCommand}"
-                Content="People" 
-                Margin="10"
-                Padding="15,12"
-                Background="#3D4050"
-                Foreground="White"
-                FontSize="14"
-                BorderThickness="0"
-                Cursor="Hand"/>
-            
-            <Button 
-                Command="{Binding ShowSettingsCommand}"
-                Content="Settings" 
-                Margin="10"
-                Padding="15,12"
-                Background="#3D4050"
-                Foreground="White"
-                FontSize="14"
-                BorderThickness="0"
-                Cursor="Hand"/>
-        </StackPanel>
+                Cursor="Hand"
+                Click="Close_Click"
+                ToolTip="Close Application"/>
 
         <!-- Main Content Area -->
-        <ContentControl Grid.Column="1"
-                        Content="{Binding CurrentView}"/>
+        <Border Grid.Column="1"
+                Background="#F5F6FA"
+                Padding="20">
+            <ContentControl Content="{Binding CurrentView}"/>
+        </Border>
     </Grid>
 </Window>

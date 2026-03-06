@@ -8,5 +8,106 @@
         <local:InvertBooleanToVisibilityConverter x:Key="InvertBoolToVisibilityConverter"/>
         <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
         <local:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
+
+        <!-- Dark Theme Color Resources -->
+        <SolidColorBrush x:Key="AppBackground" Color="#0F1117"/>
+        <SolidColorBrush x:Key="PanelBackground" Color="#161B22"/>
+        <SolidColorBrush x:Key="SidebarBackgroundTop" Color="#1B1E24"/>
+        <SolidColorBrush x:Key="SidebarBackgroundBottom" Color="#111318"/>
+        <SolidColorBrush x:Key="AccentColor" Color="#4F7DF3"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="White"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#9CA3AF"/>
+
+        <!-- Sidebar Button Style -->
+        <Style x:Key="SidebarButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#2A2E38"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            Padding="15,10">
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#3D4150"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#4F7DF3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Light DataGrid Style -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderBrush" Value="#E5E7EB"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#F9FAFB"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#E5E7EB"/>
+            <Setter Property="VerticalGridLinesBrush" Value="#E5E7EB"/>
+        </Style>
+
+        <!-- Light DataGridColumnHeader Style -->
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#F9FAFB"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderBrush" Value="#E5E7EB"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <!-- Light DataGridCell Style -->
+        <Style TargetType="DataGridCell">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- TextBlock Style for content -->
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        </Style>
+
+        <!-- Light TextBox Style -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8"/>
+        </Style>
+
+        <!-- Light ComboBox Style -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- Light DatePicker Style -->
+        <Style TargetType="DatePicker">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
     </Application.Resources>
 </Application>

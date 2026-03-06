@@ -137,6 +137,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Assets\noise.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\noise.png.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

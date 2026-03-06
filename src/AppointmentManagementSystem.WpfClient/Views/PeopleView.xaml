@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="900">
-    <Grid>
+    <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -16,7 +16,7 @@
                    Text="Patients"
                    FontSize="24"
                    FontWeight="Bold"
-                   Foreground="#333333"
+                   Foreground="Black"
                    Margin="20,20,20,10"/>
 
         <!-- Patients DataGrid -->
@@ -27,7 +27,7 @@
                   CanUserDeleteRows="False"
                   Margin="20"
                   BorderThickness="1"
-                  BorderBrush="#E0E0E0">
+                  BorderBrush="#E5E7EB">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" 
                                     Binding="{Binding Name}" 

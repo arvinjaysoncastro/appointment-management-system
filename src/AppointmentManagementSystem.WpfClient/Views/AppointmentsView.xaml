@@ -5,88 +5,161 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="900">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
 
-        <!-- Top Toolbar with Date Picker and Buttons -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,15,20,15" Height="50" VerticalAlignment="Center">
-            <DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+	<Grid Background="White">
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+
+
+		<!-- TOP TOOLBAR -->
+		<StackPanel Grid.Row="0"
+                    Orientation="Horizontal"
+                    Margin="20,15,20,15"
+                    Height="50"
+                    VerticalAlignment="Center">
+
+			<DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
                         Width="150"
                         Margin="0,0,15,0"
                         Padding="8"/>
-            <Button Command="{Binding LoadAppointmentsCommand}" 
+
+			<Button Command="{Binding LoadAppointmentsCommand}"
                     Padding="15,10"
                     Width="150"
                     Content="Load Appointments"
-                    Background="#4CAF50"
+                    Background="#4F7DF3"
                     Foreground="White"
-                    FontWeight="SemiBold"/>
-            <Button Command="{Binding AddAppointmentCommand}" 
+                    FontWeight="SemiBold"
+                    BorderThickness="0"
+                    Cursor="Hand"/>
+
+			<Button Command="{Binding AddAppointmentCommand}"
                     Padding="15,10"
                     Margin="10,0,0,0"
                     Width="150"
                     Content="Add Appointment"
-                    Background="#2196F3"
+                    Background="#10B981"
                     Foreground="White"
-                    FontWeight="SemiBold"/>
-        </StackPanel>
+                    FontWeight="SemiBold"
+                    BorderThickness="0"
+                    Cursor="Hand"/>
 
-        <!-- Loading Indicator -->
-        <StackPanel Grid.Row="1"
+		</StackPanel>
+
+
+		<!-- LOADING -->
+		<StackPanel Grid.Row="1"
                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center">
-            <TextBlock Text="Loading appointments..." 
+
+			<TextBlock Text="Loading appointments..."
                        HorizontalAlignment="Center"
                        Margin="0,0,0,10"
-                       FontSize="16"/>
-        </StackPanel>
+                       FontSize="16"
+                       Foreground="Black"/>
 
-        <!-- Appointments DataGrid -->
-        <DataGrid Grid.Row="1" 
-                  ItemsSource="{Binding Appointments}"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  Visibility="{Binding IsLoading, Converter={StaticResource InvertBoolToVisibilityConverter}}"
-                  Margin="20"
-                  BorderThickness="1"
-                  BorderBrush="#E0E0E0">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" 
-                                    Binding="{Binding Id}" 
-                                    Width="200"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn Header="Patient Name" 
-                                    Binding="{Binding PatientName}" 
-                                    Width="150"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn Header="Title" 
-                                    Binding="{Binding Title}" 
-                                    Width="150"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn Header="Start Time" 
-                                    Binding="{Binding StartTime, StringFormat='g'}" 
-                                    Width="180"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn Header="End Time" 
-                                    Binding="{Binding EndTime, StringFormat='g'}" 
-                                    Width="180"
-                                    IsReadOnly="True"/>
-            </DataGrid.Columns>
-        </DataGrid>
+		</StackPanel>
 
-        <!-- Error Message -->
-        <TextBlock Grid.Row="2"
+
+		<!-- TIMELINE APPOINTMENTS -->
+		<ScrollViewer Grid.Row="1"
+                      Margin="20"
+                      Visibility="{Binding IsLoading, Converter={StaticResource InvertBoolToVisibilityConverter}}"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+
+			<ItemsControl ItemsSource="{Binding Appointments}">
+
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+
+
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+
+						<Grid Margin="0,0,0,14">
+
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="80"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+
+
+							<!-- TIME COLUMN -->
+							<TextBlock Grid.Column="0"
+                                       Text="{Binding StartTime, StringFormat={}{0:HH:mm}}"
+                                       FontWeight="Bold"
+                                       FontSize="14"
+                                       VerticalAlignment="Top"
+                                       Foreground="Black"/>
+
+
+							<!-- APPOINTMENT CARD -->
+							<Border Grid.Column="1"
+                                    Background="White"
+                                    BorderBrush="#E5E7EB"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Padding="16"
+                                    Margin="0,0,0,0">
+
+								<StackPanel>
+
+									<TextBlock
+                                        Text="{Binding Title}"
+                                        FontWeight="Bold"
+                                        FontSize="15"
+                                        Foreground="Black"/>
+
+									<TextBlock
+                                        Text="{Binding PatientName, StringFormat=Patient: {0}}"
+                                        Margin="0,6,0,0"
+                                        Foreground="Black"
+                                        FontSize="14"/>
+
+									<TextBlock
+                                        Text="{Binding StartTime, StringFormat={}{0:HH:mm}}"
+                                        Margin="0,6,0,0"
+                                        FontSize="13"
+                                        Foreground="Black"/>
+
+									<TextBlock
+                                        Text="{Binding EndTime, StringFormat=Ends: {0:HH:mm}}"
+                                        Margin="0,2,0,0"
+                                        FontSize="13"
+                                        Foreground="Black"/>
+
+								</StackPanel>
+
+							</Border>
+
+						</Grid>
+
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+
+			</ItemsControl>
+
+		</ScrollViewer>
+
+
+		<!-- ERROR MESSAGE -->
+		<TextBlock Grid.Row="2"
                    Text="{Binding ErrorMessage}"
                    Foreground="Red"
                    Margin="20,10,20,10"
                    TextWrapping="Wrap"
                    FontSize="12"
                    Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
-    </Grid>
+
+	</Grid>
+
 </UserControl>
