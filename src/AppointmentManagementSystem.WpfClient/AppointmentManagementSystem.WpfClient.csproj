@@ -69,6 +69,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="BooleanInvertConverter.cs" />
+    <Compile Include="Helpers\PatientLookup.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Infrastructure\ViewModelBase.cs" />
     <Compile Include="InvertBooleanToVisibilityConverter.cs" />

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using AppointmentManagementSystem.WpfClient.Helpers;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
 using AppointmentManagementSystem.WpfClient.Services;
 using AppointmentManagementSystem.WpfClient.Views;
@@ -17,6 +18,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private readonly IAppointmentApiClient _appointmentApiClient;
         private readonly AppointmentCreateViewModel _createViewModel;
         private ObservableCollection<AppointmentItemViewModel> _appointments;
+        private DateTime _selectedDate;
         private bool _isLoading;
         private string _errorMessage;
 
@@ -24,6 +26,12 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         {
             get => _appointments;
             set => SetProperty(ref _appointments, value);
+        }
+
+        public DateTime SelectedDate
+        {
+            get => _selectedDate;
+            set => SetProperty(ref _selectedDate, value);
         }
 
         public bool IsLoading
@@ -46,6 +54,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             _appointmentApiClient = appointmentApiClient ?? throw new ArgumentNullException(nameof(appointmentApiClient));
             _createViewModel = createViewModel ?? throw new ArgumentNullException(nameof(createViewModel));
             Appointments = new ObservableCollection<AppointmentItemViewModel>();
+            SelectedDate = DateTime.Today;
             LoadAppointmentsCommand = new AsyncRelayCommand(LoadAppointmentsAsync);
             AddAppointmentCommand = new RelayCommand(_ => ShowCreateAppointmentDialog());
         }
@@ -57,17 +66,20 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
 
             try
             {
-                var appointments = await _appointmentApiClient.GetAppointmentsAsync(DateTime.Now.Date);
+                var appointments = await _appointmentApiClient.GetAppointmentsAsync(SelectedDate);
                 
                 // Clear and repopulate collection
                 Appointments.Clear();
                 foreach (var appointment in appointments)
                 {
+                    // Resolve patient name from static lookup
+                    var patientName = PatientLookup.GetName(appointment.PatientId);
+                    
                     Appointments.Add(new AppointmentItemViewModel
                     {
                         Id = appointment.Id,
                         PatientId = appointment.PatientId,
-                        PatientName = appointment.PatientName,
+                        PatientName = patientName,
                         StartTime = appointment.StartTime,
                         EndTime = appointment.EndTime,
                         Title = appointment.Title

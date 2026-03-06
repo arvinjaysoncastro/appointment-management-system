@@ -13,13 +13,18 @@
         </Grid.RowDefinitions>
 
         <!-- Toolbar -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10" Height="40">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10" Height="40" VerticalAlignment="Center">
+            <DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                        Width="150"
+                        Margin="0,0,10,0"/>
             <Button Command="{Binding LoadAppointmentsCommand}" 
-                    Padding="10,5" 
+                    Padding="10,5"
+                    Width="150"
                     Content="Load Appointments"/>
             <Button Command="{Binding AddAppointmentCommand}" 
                     Padding="10,5" 
                     Margin="10,0,0,0"
+                    Width="150"
                     Content="Add Appointment"/>
         </StackPanel>
 
