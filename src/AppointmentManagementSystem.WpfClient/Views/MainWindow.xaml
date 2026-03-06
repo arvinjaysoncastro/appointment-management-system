@@ -8,6 +8,7 @@
         mc:Ignorable="d"
         Title="Appointment Management System" Height="700" Width="1200" WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize">
+    
     <Grid Background="{StaticResource AppBackground}" MouseDown="WindowDrag">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="220"/>
@@ -47,7 +48,7 @@
                 <Button 
                     Command="{Binding ShowAppointmentsCommand}"
                     Content="Appointments" 
-                    Style="{StaticResource SidebarButtonStyle}"/>
+                    Style="{StaticResource SidebarButtonStyle}" Click="Button_Click"/>
                 
                 <Button 
                     Command="{Binding ShowPeopleCommand}"
