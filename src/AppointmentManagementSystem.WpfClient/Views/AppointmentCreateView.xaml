@@ -28,12 +28,16 @@
         <!-- Title -->
         <TextBlock Grid.Row="0" Text="Create New Appointment" FontSize="16" FontWeight="Bold" Margin="0,0,0,20"/>
 
-        <!-- Patient ID -->
-        <TextBlock Grid.Row="1" Text="Patient ID:" Margin="0,0,0,5"/>
-        <TextBox Grid.Row="2" 
-                 Text="{Binding PatientId, UpdateSourceTrigger=PropertyChanged}" 
-                 Padding="8"
-                 Margin="0,0,0,15"/>
+        <!-- Patient Selection -->
+        <TextBlock Grid.Row="1" Text="Patient:" Margin="0,0,0,5"/>
+        <ComboBox Grid.Row="2"
+                  ItemsSource="{Binding Patients}"
+                  SelectedItem="{Binding SelectedPatient}"
+                  DisplayMemberPath="Name"
+                  Width="250"
+                  HorizontalAlignment="Left"
+                  Padding="8"
+                  Margin="0,0,0,15"/>
 
         <!-- Title -->
         <TextBlock Grid.Row="3" Text="Appointment Title:" Margin="0,0,0,5"/>

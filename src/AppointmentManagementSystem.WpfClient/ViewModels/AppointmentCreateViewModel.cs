@@ -1,6 +1,8 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
+using AppointmentManagementSystem.WpfClient.Models;
 using AppointmentManagementSystem.WpfClient.Services;
 
 namespace AppointmentManagementSystem.WpfClient.ViewModels
@@ -12,7 +14,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
     public class AppointmentCreateViewModel : ViewModelBase
     {
         private readonly IAppointmentApiClient _appointmentApiClient;
-        private Guid _patientId;
+        private PatientOption _selectedPatient;
         private string _title = string.Empty;
         private string _notes = string.Empty;
         private DateTimeOffset _startTime = DateTimeOffset.Now.Date.AddHours(9);
@@ -20,10 +22,12 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private string _errorMessage = string.Empty;
         private bool _isSubmitting;
 
-        public Guid PatientId
+        public ObservableCollection<PatientOption> Patients { get; }
+
+        public PatientOption SelectedPatient
         {
-            get => _patientId;
-            set => SetProperty(ref _patientId, value);
+            get => _selectedPatient;
+            set => SetProperty(ref _selectedPatient, value);
         }
 
         public string Title
@@ -78,6 +82,29 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         public AppointmentCreateViewModel(IAppointmentApiClient appointmentApiClient)
         {
             _appointmentApiClient = appointmentApiClient ?? throw new ArgumentNullException(nameof(appointmentApiClient));
+            
+            // NOTE:
+            // Due to time constraints for this technical assessment,
+            // Patient CRUD and lookup UI were not implemented.
+            // Instead a predefined patient list is used that matches
+            // the seeded database patients.
+            Patients = new ObservableCollection<PatientOption>
+            {
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000001"), Name = "John Smith" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), Name = "Mary Johnson" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000003"), Name = "David Lee" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000004"), Name = "Sarah Miller" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000005"), Name = "Michael Brown" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000006"), Name = "Emily Davis" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000007"), Name = "Daniel Wilson" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000008"), Name = "Olivia Martinez" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000009"), Name = "James Anderson" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000010"), Name = "Sophia Taylor" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000011"), Name = "Benjamin Thomas" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000012"), Name = "Charlotte Moore" },
+                new PatientOption { Id = Guid.Parse("00000000-0000-0000-0000-000000000013"), Name = "Lucas Jackson" }
+            };
+
             CreateCommand = new AsyncRelayCommand(CreateAppointmentAsync, CanCreateAppointment);
             CancelCommand = new RelayCommand(_ => OnCancelled());
         }
@@ -85,7 +112,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private bool CanCreateAppointment()
         {
             return !string.IsNullOrWhiteSpace(Title) 
-                && PatientId != Guid.Empty 
+                && SelectedPatient != null
                 && EndTime > StartTime 
                 && !IsSubmitting;
         }
@@ -103,6 +130,12 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                     return;
                 }
 
+                if (SelectedPatient == null)
+                {
+                    ErrorMessage = "Please select a patient.";
+                    return;
+                }
+
                 // Ensure proper DateTimeOffset conversion
                 // If the DateTime is unspecified or UTC, treat as Local for user input
                 var startOffset = ConvertToDateTimeOffset(StartTime);
@@ -110,7 +143,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
 
                 var dto = new CreateAppointmentDto
                 {
-                    PatientId = PatientId,
+                    PatientId = SelectedPatient.Id,
                     Title = Title,
                     Notes = Notes,
                     StartTime = startOffset,

@@ -87,7 +87,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private void ShowCreateAppointmentDialog()
         {
             // Reset the create view model
-            _createViewModel.PatientId = Guid.Empty;
+            _createViewModel.SelectedPatient = null;
             _createViewModel.Title = string.Empty;
             _createViewModel.Notes = string.Empty;
             _createViewModel.StartTime = DateTimeOffset.Now.Date.AddHours(9);
