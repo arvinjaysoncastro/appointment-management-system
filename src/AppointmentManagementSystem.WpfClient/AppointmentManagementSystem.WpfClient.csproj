@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DateTimeOffsetToDateTimeConverter.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="Views\PeopleView.xaml.cs">
       <DependentUpon>PeopleView.xaml</DependentUpon>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using AppointmentManagementSystem.WpfClient.Helpers;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
@@ -21,6 +22,8 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private DateTime _selectedDate;
         private bool _isLoading;
         private string _errorMessage;
+        private bool _isDrawerOpen;
+        private AppointmentItemViewModel _selectedAppointment;
 
         public ObservableCollection<AppointmentItemViewModel> Appointments
         {
@@ -46,8 +49,26 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             set => SetProperty(ref _errorMessage, value);
         }
 
+        public bool IsDrawerOpen
+        {
+            get => _isDrawerOpen;
+            set => SetProperty(ref _isDrawerOpen, value);
+        }
+
+        public AppointmentItemViewModel SelectedAppointment
+        {
+            get => _selectedAppointment;
+            set => SetProperty(ref _selectedAppointment, value);
+        }
+
+        public AppointmentCreateViewModel CreateViewModel => _createViewModel;
+
         public ICommand LoadAppointmentsCommand { get; }
         public ICommand AddAppointmentCommand { get; }
+        public ICommand OpenCreateDrawerCommand { get; }
+        public ICommand CloseDrawerCommand { get; }
+        public ICommand EditAppointmentCommand { get; }
+        public ICommand DeleteAppointmentCommand { get; }
 
         public AppointmentListViewModel(IAppointmentApiClient appointmentApiClient, AppointmentCreateViewModel createViewModel)
         {
@@ -56,7 +77,11 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             Appointments = new ObservableCollection<AppointmentItemViewModel>();
             SelectedDate = DateTime.Today;
             LoadAppointmentsCommand = new AsyncRelayCommand(LoadAppointmentsAsync);
-            AddAppointmentCommand = new RelayCommand(_ => ShowCreateAppointmentDialog());
+            AddAppointmentCommand = new RelayCommand(_ => OpenCreateDrawer());
+            OpenCreateDrawerCommand = new RelayCommand(_ => OpenCreateDrawer());
+            CloseDrawerCommand = new RelayCommand(_ => CloseDrawer());
+            EditAppointmentCommand = new RelayCommand<AppointmentItemViewModel>(EditAppointment);
+            DeleteAppointmentCommand = new RelayCommand<AppointmentItemViewModel>(DeleteAppointment);
         }
 
         private async System.Threading.Tasks.Task LoadAppointmentsAsync()
@@ -96,8 +121,11 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             }
         }
 
-        private void ShowCreateAppointmentDialog()
+        private void OpenCreateDrawer()
         {
+            // Reset selected appointment for new creation
+            SelectedAppointment = null;
+
             // Reset the create view model
             _createViewModel.SelectedPatient = null;
             _createViewModel.Title = string.Empty;
@@ -106,16 +134,38 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             _createViewModel.EndTime = DateTimeOffset.Now.Date.AddHours(10);
             _createViewModel.ErrorMessage = string.Empty;
 
-            // Create and show dialog
-            var view = new AppointmentCreateView(_createViewModel);
-            var result = view.ShowDialog();
+            // Open drawer
+            IsDrawerOpen = true;
+        }
 
-            // If dialog was successful, refresh the list
-            if (result == true)
-            {
-                // Refresh appointments list
-                _ = LoadAppointmentsAsync();
-            }
+        private void CloseDrawer()
+        {
+            IsDrawerOpen = false;
+            SelectedAppointment = null;
+        }
+
+        private void EditAppointment(AppointmentItemViewModel appointment)
+        {
+            SelectedAppointment = appointment;
+
+            // Populate the create view model with appointment data for editing
+            _createViewModel.Title = appointment.Title;
+            _createViewModel.Notes = string.Empty;
+            _createViewModel.StartTime = appointment.StartTime;
+            _createViewModel.EndTime = appointment.EndTime;
+            _createViewModel.ErrorMessage = string.Empty;
+
+            // Find and select the patient by ID
+            var selectedPatient = _createViewModel.Patients.FirstOrDefault(p => p.Id == appointment.PatientId);
+            _createViewModel.SelectedPatient = selectedPatient;
+
+            // Open drawer for editing
+            IsDrawerOpen = true;
+        }
+
+        private void DeleteAppointment(AppointmentItemViewModel appointment)
+        {
+            Appointments.Remove(appointment);
         }
     }
 

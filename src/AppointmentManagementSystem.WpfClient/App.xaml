@@ -8,6 +8,7 @@
         <local:InvertBooleanToVisibilityConverter x:Key="InvertBoolToVisibilityConverter"/>
         <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
         <local:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
+        <local:DateTimeOffsetToDateTimeConverter x:Key="DateTimeOffsetToDateTimeConverter"/>
 
         <!-- Dark Theme Color Resources -->
         <SolidColorBrush x:Key="AppBackground" Color="#0F1117"/>

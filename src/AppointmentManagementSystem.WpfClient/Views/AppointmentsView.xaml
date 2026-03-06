@@ -8,6 +8,11 @@
 
 	<Grid Background="White">
 
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="400"/>
+		</Grid.ColumnDefinitions>
+
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="*"/>
@@ -17,6 +22,7 @@
 
 		<!-- TOP TOOLBAR -->
 		<StackPanel Grid.Row="0"
+                    Grid.Column="0"
                     Orientation="Horizontal"
                     Margin="20,15,20,15"
                     Height="50"
@@ -53,6 +59,7 @@
 
 		<!-- LOADING -->
 		<StackPanel Grid.Row="1"
+                    Grid.Column="0"
                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center">
@@ -68,6 +75,7 @@
 
 		<!-- TIMELINE APPOINTMENTS -->
 		<ScrollViewer Grid.Row="1"
+                      Grid.Column="0"
                       Margin="20"
                       Visibility="{Binding IsLoading, Converter={StaticResource InvertBoolToVisibilityConverter}}"
                       VerticalScrollBarVisibility="Auto"
@@ -102,44 +110,87 @@
                                        Foreground="Black"/>
 
 
-							<!-- APPOINTMENT CARD -->
-							<Border Grid.Column="1"
-                                    Background="White"
-                                    BorderBrush="#E5E7EB"
-                                    BorderThickness="1"
-                                    CornerRadius="10"
-                                    Padding="16"
-                                    Margin="0,0,0,0">
+							<!-- APPOINTMENT CARD BUTTON -->
+							<Button Grid.Column="1"
+                                    Command="{Binding DataContext.EditAppointmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch">
 
-								<StackPanel>
+								<Grid>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto"/>
+										<RowDefinition Height="*"/>
+									</Grid.RowDefinitions>
 
-									<TextBlock
-                                        Text="{Binding Title}"
-                                        FontWeight="Bold"
-                                        FontSize="15"
-                                        Foreground="Black"/>
+									<!-- APPOINTMENT CARD -->
+									<Border Grid.Row="0"
+                                            Background="White"
+                                            BorderBrush="#E5E7EB"
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Padding="16"
+                                            Margin="0,0,0,0">
 
-									<TextBlock
-                                        Text="{Binding PatientName, StringFormat=Patient: {0}}"
-                                        Margin="0,6,0,0"
-                                        Foreground="Black"
-                                        FontSize="14"/>
+										<Grid>
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="*"/>
+												<ColumnDefinition Width="Auto"/>
+											</Grid.ColumnDefinitions>
 
-									<TextBlock
-                                        Text="{Binding StartTime, StringFormat={}{0:HH:mm}}"
-                                        Margin="0,6,0,0"
-                                        FontSize="13"
-                                        Foreground="Black"/>
+											<!-- Card Content -->
+											<StackPanel Grid.Column="0">
 
-									<TextBlock
-                                        Text="{Binding EndTime, StringFormat=Ends: {0:HH:mm}}"
-                                        Margin="0,2,0,0"
-                                        FontSize="13"
-                                        Foreground="Black"/>
+												<TextBlock
+                                                    Text="{Binding Title}"
+                                                    FontWeight="Bold"
+                                                    FontSize="15"
+                                                    Foreground="Black"/>
 
-								</StackPanel>
+												<TextBlock
+                                                    Text="{Binding PatientName, StringFormat=Patient: {0}}"
+                                                    Margin="0,6,0,0"
+                                                    Foreground="Black"
+                                                    FontSize="14"/>
 
-							</Border>
+												<TextBlock
+                                                    Text="{Binding StartTime, StringFormat={}{0:HH:mm}}"
+                                                    Margin="0,6,0,0"
+                                                    FontSize="13"
+                                                    Foreground="Black"/>
+
+												<TextBlock
+                                                    Text="{Binding EndTime, StringFormat=Ends: {0:HH:mm}}"
+                                                    Margin="0,2,0,0"
+                                                    FontSize="13"
+                                                    Foreground="Black"/>
+
+											</StackPanel>
+
+											<!-- Delete Button -->
+											<Button Grid.Column="1"
+                                                    Content="Delete"
+                                                    Command="{Binding DataContext.DeleteAppointmentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="#EF4444"
+                                                    Foreground="White"
+                                                    Padding="6,2"
+                                                    FontSize="12"
+                                                    BorderThickness="0"
+                                                    Cursor="Hand"
+                                                    VerticalAlignment="Top"
+                                                    Margin="8,0,0,0"/>
+
+										</Grid>
+
+									</Border>
+
+								</Grid>
+
+							</Button>
 
 						</Grid>
 
@@ -153,12 +204,123 @@
 
 		<!-- ERROR MESSAGE -->
 		<TextBlock Grid.Row="2"
+                   Grid.Column="0"
                    Text="{Binding ErrorMessage}"
                    Foreground="Red"
                    Margin="20,10,20,10"
                    TextWrapping="Wrap"
                    FontSize="12"
                    Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
+
+
+		<!-- RIGHT DRAWER PANEL -->
+		<Border Grid.Row="0"
+                Grid.RowSpan="3"
+                Grid.Column="1"
+                Background="White"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1,0,0,0"
+                Visibility="{Binding IsDrawerOpen, Converter={StaticResource BoolToVisibilityConverter}}"
+                Padding="20">
+
+			<ScrollViewer VerticalScrollBarVisibility="Auto">
+				<StackPanel>
+
+					<TextBlock FontSize="20"
+                               FontWeight="Bold"
+                               Margin="0,0,0,20"
+                               Foreground="Black"
+                               Text="{Binding SelectedAppointment, StringFormat='Edit Appointment', FallbackValue='Create Appointment'}"/>
+
+					<!-- Patient Field -->
+					<TextBlock Text="Patient"
+                               Margin="0,0,0,6"
+                               Foreground="Black"
+                               FontWeight="SemiBold"/>
+					<ComboBox ItemsSource="{Binding CreateViewModel.Patients}"
+                              SelectedItem="{Binding CreateViewModel.SelectedPatient, Mode=TwoWay}"
+                              DisplayMemberPath="Name"
+                              Margin="0,0,0,14"
+                              Padding="8,6"/>
+
+					<!-- Title Field -->
+					<TextBlock Text="Title"
+                               Margin="0,0,0,6"
+                               Foreground="Black"
+                               FontWeight="SemiBold"/>
+					<TextBox Text="{Binding CreateViewModel.Title, Mode=TwoWay}"
+                             Margin="0,0,0,14"
+                             Padding="8,6"
+                             BorderBrush="#E5E7EB"
+                             BorderThickness="1"/>
+
+					<!-- Start Time Field -->
+					<TextBlock Text="Start Time"
+                               Margin="0,0,0,6"
+                               Foreground="Black"
+                               FontWeight="SemiBold"/>
+					<DatePicker SelectedDate="{Binding CreateViewModel.StartTime, Mode=TwoWay, Converter={StaticResource DateTimeOffsetToDateTimeConverter}}"
+                                Margin="0,0,0,14"
+                                Padding="8,6"/>
+
+					<!-- End Time Field -->
+					<TextBlock Text="End Time"
+                               Margin="0,0,0,6"
+                               Foreground="Black"
+                               FontWeight="SemiBold"/>
+					<DatePicker SelectedDate="{Binding CreateViewModel.EndTime, Mode=TwoWay, Converter={StaticResource DateTimeOffsetToDateTimeConverter}}"
+                                Margin="0,0,0,14"
+                                Padding="8,6"/>
+
+					<!-- Notes Field -->
+					<TextBlock Text="Notes"
+                               Margin="0,0,0,6"
+                               Foreground="Black"
+                               FontWeight="SemiBold"/>
+					<TextBox Text="{Binding CreateViewModel.Notes, Mode=TwoWay}"
+                             AcceptsReturn="True"
+                             Height="100"
+                             Margin="0,0,0,20"
+                             Padding="8,6"
+                             BorderBrush="#E5E7EB"
+                             BorderThickness="1"
+                             VerticalAlignment="Top"/>
+
+					<!-- Buttons -->
+					<StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+						<Button Content="Save"
+                                Command="{Binding CreateViewModel.SaveAppointmentCommand}"
+                                Padding="12,8"
+                                Background="#4F7DF3"
+                                Foreground="White"
+                                FontWeight="SemiBold"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Width="100"
+                                Margin="0,0,10,0"/>
+						<Button Content="Cancel"
+                                Command="{Binding CloseDrawerCommand}"
+                                Padding="12,8"
+                                Background="#E5E7EB"
+                                Foreground="Black"
+                                FontWeight="SemiBold"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Width="100"/>
+					</StackPanel>
+
+					<!-- Error Message in Drawer -->
+					<TextBlock Text="{Binding CreateViewModel.ErrorMessage}"
+                               Foreground="Red"
+                               Margin="0,15,0,0"
+                               TextWrapping="Wrap"
+                               FontSize="12"
+                               Visibility="{Binding CreateViewModel.ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
+
+				</StackPanel>
+			</ScrollViewer>
+
+		</Border>
 
 	</Grid>
 
