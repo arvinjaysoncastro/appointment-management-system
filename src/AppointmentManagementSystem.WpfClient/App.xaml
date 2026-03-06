@@ -58,10 +58,10 @@
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
-        <!-- TextBlock -->
+        <!-- TextBlock --><!--
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="Black"/>
-        </Style>
+        </Style>-->
 
         <!-- TextBox -->
         <Style TargetType="TextBox">
