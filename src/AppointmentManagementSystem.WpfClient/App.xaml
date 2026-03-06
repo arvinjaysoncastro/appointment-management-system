@@ -9,6 +9,9 @@
         <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
         <local:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
         <local:DateTimeOffsetToDateTimeConverter x:Key="DateTimeOffsetToDateTimeConverter"/>
+        <local:SelectedAppointmentToHeaderConverter x:Key="SelectedAppointmentToHeaderConverter"/>
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <local:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter"/>
 
         <!-- Dark Theme Color Resources -->
         <SolidColorBrush x:Key="AppBackground" Color="#0F1117"/>

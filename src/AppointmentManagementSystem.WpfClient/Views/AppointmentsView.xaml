@@ -21,40 +21,60 @@
 
 
 		<!-- TOP TOOLBAR -->
-		<StackPanel Grid.Row="0"
-                    Grid.Column="0"
-                    Orientation="Horizontal"
-                    Margin="20,15,20,15"
-                    Height="50"
-                    VerticalAlignment="Center">
+		<Grid Grid.Row="0"
+              Grid.Column="0"
+              Margin="20,15,20,15"
+              Height="50"
+              VerticalAlignment="Center">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
 
-			<DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+			<!-- Date Picker -->
+			<DatePicker Grid.Column="0"
+                        SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
                         Width="150"
-                        Margin="0,0,15,0"
                         Padding="8"/>
 
-			<Button Command="{Binding LoadAppointmentsCommand}"
-                    Padding="15,10"
-                    Width="150"
-                    Content="Load Appointments"
+			<!-- Reload Button -->
+			<Button Grid.Column="1"
+                    Command="{Binding LoadAppointmentsCommand}"
+                    Padding="8,8"
+                    Width="40"
+                    Height="40"
+                    Content="⟳"
                     Background="#4F7DF3"
                     Foreground="White"
-                    FontWeight="SemiBold"
+                    FontWeight="Bold"
+                    FontSize="18"
                     BorderThickness="0"
-                    Cursor="Hand"/>
+                    Cursor="Hand"
+                    ToolTip="Reload Appointments"
+                    Margin="15,0,0,0"/>
 
-			<Button Command="{Binding AddAppointmentCommand}"
-                    Padding="15,10"
-                    Margin="10,0,0,0"
-                    Width="150"
-                    Content="Add Appointment"
+			<!-- Add Appointment Button (Right Side) -->
+			<Border Grid.Column="3"
                     Background="#10B981"
-                    Foreground="White"
-                    FontWeight="SemiBold"
-                    BorderThickness="0"
-                    Cursor="Hand"/>
+                    CornerRadius="6"
+                    Padding="0">
+				<Button Command="{Binding AddAppointmentCommand}"
+                        Padding="16,10"
+                        Background="Transparent"
+                        Foreground="White"
+                        FontWeight="SemiBold"
+                        BorderThickness="0"
+                        Cursor="Hand">
+					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+						<TextBlock Text="+" FontSize="18" FontWeight="Bold" Margin="0,0,8,0"/>
+						<TextBlock Text="Appointment" VerticalAlignment="Center"/>
+					</StackPanel>
+				</Button>
+			</Border>
 
-		</StackPanel>
+		</Grid>
 
 
 		<!-- LOADING -->
@@ -230,18 +250,38 @@
                                FontWeight="Bold"
                                Margin="0,0,0,20"
                                Foreground="Black"
-                               Text="{Binding SelectedAppointment, StringFormat='Edit Appointment', FallbackValue='Create Appointment'}"/>
+                               Text="{Binding SelectedAppointment, Converter={StaticResource SelectedAppointmentToHeaderConverter}}"/>
 
 					<!-- Patient Field -->
 					<TextBlock Text="Patient"
                                Margin="0,0,0,6"
                                Foreground="Black"
                                FontWeight="SemiBold"/>
+
+					<!-- Patient ComboBox (for CREATE mode) -->
 					<ComboBox ItemsSource="{Binding CreateViewModel.Patients}"
                               SelectedItem="{Binding CreateViewModel.SelectedPatient, Mode=TwoWay}"
                               DisplayMemberPath="Name"
                               Margin="0,0,0,14"
-                              Padding="8,6"/>
+                              Padding="8,6"
+                              Foreground="Black"
+                              Background="White"
+                              Visibility="{Binding SelectedAppointment, Converter={StaticResource NullToVisibilityConverter}}">
+						<ComboBox.ItemContainerStyle>
+							<Style TargetType="ComboBoxItem">
+								<Setter Property="Foreground" Value="Black"/>
+								<Setter Property="Background" Value="White"/>
+							</Style>
+						</ComboBox.ItemContainerStyle>
+					</ComboBox>
+
+					<!-- Patient Label (for EDIT mode) -->
+					<TextBlock Text="{Binding SelectedAppointment.PatientName, FallbackValue=''}"
+                               Margin="0,0,0,14"
+                               Padding="8,6"
+                               Foreground="Black"
+                               FontSize="14"
+                               Visibility="{Binding SelectedAppointment, Converter={StaticResource NotNullToVisibilityConverter}}"/>
 
 					<!-- Title Field -->
 					<TextBlock Text="Title"
@@ -251,6 +291,8 @@
 					<TextBox Text="{Binding CreateViewModel.Title, Mode=TwoWay}"
                              Margin="0,0,0,14"
                              Padding="8,6"
+                             Foreground="Black"
+                             Background="White"
                              BorderBrush="#E5E7EB"
                              BorderThickness="1"/>
 
@@ -261,7 +303,9 @@
                                FontWeight="SemiBold"/>
 					<DatePicker SelectedDate="{Binding CreateViewModel.StartTime, Mode=TwoWay, Converter={StaticResource DateTimeOffsetToDateTimeConverter}}"
                                 Margin="0,0,0,14"
-                                Padding="8,6"/>
+                                Padding="8,6"
+                                Foreground="Black"
+                                Background="White"/>
 
 					<!-- End Time Field -->
 					<TextBlock Text="End Time"
@@ -270,7 +314,9 @@
                                FontWeight="SemiBold"/>
 					<DatePicker SelectedDate="{Binding CreateViewModel.EndTime, Mode=TwoWay, Converter={StaticResource DateTimeOffsetToDateTimeConverter}}"
                                 Margin="0,0,0,14"
-                                Padding="8,6"/>
+                                Padding="8,6"
+                                Foreground="Black"
+                                Background="White"/>
 
 					<!-- Notes Field -->
 					<TextBlock Text="Notes"
@@ -282,6 +328,8 @@
                              Height="100"
                              Margin="0,0,0,20"
                              Padding="8,6"
+                             Foreground="Black"
+                             Background="White"
                              BorderBrush="#E5E7EB"
                              BorderThickness="1"
                              VerticalAlignment="Top"/>

@@ -6,14 +6,28 @@
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="900">
     <Grid Background="White">
-        <StackPanel Margin="40" VerticalAlignment="Top">
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="40">
+
             
             <!-- Page Header -->
-            <TextBlock Text="Clinic Settings"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       Foreground="Black"
-                       Margin="0,0,0,30"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,30">
+                <TextBlock Text="Clinic Settings"
+                           FontSize="26"
+                           FontWeight="Bold"
+                           Foreground="Black"
+                           VerticalAlignment="Center"/>
+                <Border Background="#F59E0B"
+                        CornerRadius="6"
+                        Padding="6,2"
+                        Margin="10,4,0,0">
+                    <TextBlock Text="SOON"
+                               Foreground="White"
+                               FontSize="11"
+                               FontWeight="Bold"/>
+                </Border>
+            </StackPanel>
 
             <!-- Working Hours Section -->
             <TextBlock Text="Clinic Working Hours"
@@ -94,9 +108,9 @@
                        FontSize="16"
                        FontWeight="SemiBold"
                        Foreground="#6B7280"
-                       Margin="0,0,0,15"/>
+                       Margin="0,20,0,15"/>
 
-            <TextBox Margin="20,0,0,15"
+            <TextBox Margin="20,0,0,30"
                      Text="{Binding HolidayDates, UpdateSourceTrigger=PropertyChanged}"
                      Padding="10"
                      Height="80"
@@ -104,13 +118,634 @@
                      VerticalScrollBarVisibility="Auto"
                      FontSize="12"/>
 
+
+            <!-- FUTURE CAPABILITIES SECTION -->
+            <TextBlock Text="Future Capabilities"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Foreground="Black"
+                       Margin="0,30,0,20"/>
+
+
+            <!-- Clinic Profile Section -->
+            <Border BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="15"
+                    Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Clinic Profile"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="Black"
+                               Margin="0,0,0,15"/>
+
+                    <!-- Clinic Name -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Clinic Name:" Foreground="Black" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" Padding="8" Height="32" FontSize="12" Margin="0,0,20,0"/>
+                    </Grid>
+
+                    <!-- Clinic Address -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Address:" Foreground="Black" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" Padding="8" Height="32" FontSize="12" Margin="0,0,20,0"/>
+                    </Grid>
+
+                    <!-- Phone Number -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Phone:" Foreground="Black" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" Padding="8" Height="32" FontSize="12" Margin="0,0,20,0"/>
+                    </Grid>
+
+                    <!-- Email -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Email:" Foreground="Black" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" Padding="8" Height="32" FontSize="12" Margin="0,0,20,0"/>
+                    </Grid>
+
+                    <!-- Timezone -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Timezone:" Foreground="Black" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" Padding="8" Height="32" FontSize="12">
+                            <ComboBoxItem>UTC</ComboBoxItem>
+                            <ComboBoxItem>EST</ComboBoxItem>
+                            <ComboBoxItem>PST</ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Currency -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Currency:" Foreground="Black" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" Padding="8" Height="32" FontSize="12">
+                            <ComboBoxItem>USD</ComboBoxItem>
+                            <ComboBoxItem>EUR</ComboBoxItem>
+                            <ComboBoxItem>GBP</ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+
+            <!-- Advanced Working Hours Section -->
+            <Border BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="15"
+                    Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Advanced Working Hours"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="Black"
+                               Margin="0,0,0,15"/>
+
+                    <!-- Monday -->
+                    <TextBlock Text="Monday" FontWeight="SemiBold" Foreground="Black" Margin="0,0,0,8"/>
+                    <Grid Margin="20,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="0" Padding="4" Height="28" FontSize="11" Margin="30,0,5,0"/>
+                        <TextBlock Grid.Column="1" Text="End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="1" Padding="4" Height="28" FontSize="11" Margin="20,0,5,0"/>
+                        <TextBlock Grid.Column="2" Text="Break Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="2" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                        <TextBlock Grid.Column="3" Text="Break End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="3" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                    </Grid>
+
+                    <!-- Tuesday -->
+                    <TextBlock Text="Tuesday" FontWeight="SemiBold" Foreground="Black" Margin="0,8,0,8"/>
+                    <Grid Margin="20,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="0" Padding="4" Height="28" FontSize="11" Margin="30,0,5,0"/>
+                        <TextBlock Grid.Column="1" Text="End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="1" Padding="4" Height="28" FontSize="11" Margin="20,0,5,0"/>
+                        <TextBlock Grid.Column="2" Text="Break Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="2" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                        <TextBlock Grid.Column="3" Text="Break End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="3" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                    </Grid>
+
+                    <!-- Wednesday -->
+                    <TextBlock Text="Wednesday" FontWeight="SemiBold" Foreground="Black" Margin="0,8,0,8"/>
+                    <Grid Margin="20,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="0" Padding="4" Height="28" FontSize="11" Margin="30,0,5,0"/>
+                        <TextBlock Grid.Column="1" Text="End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="1" Padding="4" Height="28" FontSize="11" Margin="20,0,5,0"/>
+                        <TextBlock Grid.Column="2" Text="Break Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="2" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                        <TextBlock Grid.Column="3" Text="Break End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="3" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                    </Grid>
+
+                    <!-- Thursday -->
+                    <TextBlock Text="Thursday" FontWeight="SemiBold" Foreground="Black" Margin="0,8,0,8"/>
+                    <Grid Margin="20,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="0" Padding="4" Height="28" FontSize="11" Margin="30,0,5,0"/>
+                        <TextBlock Grid.Column="1" Text="End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="1" Padding="4" Height="28" FontSize="11" Margin="20,0,5,0"/>
+                        <TextBlock Grid.Column="2" Text="Break Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="2" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                        <TextBlock Grid.Column="3" Text="Break End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="3" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                    </Grid>
+
+                    <!-- Friday -->
+                    <TextBlock Text="Friday" FontWeight="SemiBold" Foreground="Black" Margin="0,8,0,8"/>
+                    <Grid Margin="20,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="0" Padding="4" Height="28" FontSize="11" Margin="30,0,5,0"/>
+                        <TextBlock Grid.Column="1" Text="End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="1" Padding="4" Height="28" FontSize="11" Margin="20,0,5,0"/>
+                        <TextBlock Grid.Column="2" Text="Break Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="2" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                        <TextBlock Grid.Column="3" Text="Break End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="3" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                    </Grid>
+
+                    <!-- Saturday -->
+                    <TextBlock Text="Saturday" FontWeight="SemiBold" Foreground="Black" Margin="0,8,0,8"/>
+                    <Grid Margin="20,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="0" Padding="4" Height="28" FontSize="11" Margin="30,0,5,0"/>
+                        <TextBlock Grid.Column="1" Text="End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="1" Padding="4" Height="28" FontSize="11" Margin="20,0,5,0"/>
+                        <TextBlock Grid.Column="2" Text="Break Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="2" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                        <TextBlock Grid.Column="3" Text="Break End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="3" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                    </Grid>
+
+                    <!-- Sunday -->
+                    <TextBlock Text="Sunday" FontWeight="SemiBold" Foreground="Black" Margin="0,8,0,8"/>
+                    <Grid Margin="20,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="0" Padding="4" Height="28" FontSize="11" Margin="30,0,5,0"/>
+                        <TextBlock Grid.Column="1" Text="End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="1" Padding="4" Height="28" FontSize="11" Margin="20,0,5,0"/>
+                        <TextBlock Grid.Column="2" Text="Break Start:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="2" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                        <TextBlock Grid.Column="3" Text="Break End:" Foreground="#6B7280" FontSize="11"/>
+                        <TextBox Grid.Column="3" Padding="4" Height="28" FontSize="11" Margin="15,0,5,0"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+
+            <!-- Holiday Calendar Section -->
+            <Border BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="15"
+                    Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Holiday Calendar"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="Black"
+                               Margin="0,0,0,15"/>
+
+                    <ListBox Height="120" Margin="0,0,20,12" BorderBrush="#E5E7EB" BorderThickness="1">
+                        <ListBoxItem Foreground="#9CA3AF">(Holidays will appear here)</ListBoxItem>
+                    </ListBox>
+
+                    <Button Content="[Add Holiday]"
+                            Padding="10,8"
+                            Background="White"
+                            Foreground="#4F7DF3"
+                            BorderBrush="#4F7DF3"
+                            BorderThickness="1"
+                            Cursor="Hand"
+                            Width="100"/>
+                </StackPanel>
+            </Border>
+
+
+            <!-- Appointment Rules Section -->
+            <Border BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="15"
+                    Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Appointment Rules"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="Black"
+                               Margin="0,0,0,15"/>
+
+                    <!-- Default Appointment Duration -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Default Appointment Duration:" Foreground="Black" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" Padding="8" Height="32" FontSize="12" Margin="0,0,20,0">
+                            <ComboBoxItem>15 minutes</ComboBoxItem>
+                            <ComboBoxItem>30 minutes</ComboBoxItem>
+                            <ComboBoxItem>1 hour</ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Minimum Booking Notice -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Minimum Booking Notice:" Foreground="Black" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" Padding="8" Height="32" FontSize="12" Margin="0,0,20,0">
+                            <ComboBoxItem>Same day</ComboBoxItem>
+                            <ComboBoxItem>24 hours</ComboBoxItem>
+                            <ComboBoxItem>48 hours</ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Maximum Booking Window -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Maximum Booking Window:" Foreground="Black" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" Padding="8" Height="32" FontSize="12" Margin="0,0,20,0">
+                            <ComboBoxItem>1 week</ComboBoxItem>
+                            <ComboBoxItem>2 weeks</ComboBoxItem>
+                            <ComboBoxItem>1 month</ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Buffer Between Appointments -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Buffer Between Appointments:" Foreground="Black" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" Padding="8" Height="32" FontSize="12" Margin="0,0,20,0">
+                            <ComboBoxItem>No buffer</ComboBoxItem>
+                            <ComboBoxItem>5 minutes</ComboBoxItem>
+                            <ComboBoxItem>15 minutes</ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+
+            <!-- Staff Scheduling Section -->
+            <Border BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="15"
+                    Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Staff Scheduling"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="Black"
+                               Margin="0,0,0,15"/>
+
+                    <!-- Doctor/Staff -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Doctor/Staff:" Foreground="Black" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" Padding="8" Height="32" FontSize="12" Margin="0,0,20,0">
+                            <ComboBoxItem>Dr. Smith</ComboBoxItem>
+                            <ComboBoxItem>Dr. Johnson</ComboBoxItem>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Working Days -->
+                    <TextBlock Text="Working Days:" Foreground="Black" Margin="0,0,0,8"/>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,12">
+                        <CheckBox Content="Monday" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                        <CheckBox Content="Tuesday" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                        <CheckBox Content="Wednesday" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                        <CheckBox Content="Thursday" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                        <CheckBox Content="Friday" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                        <CheckBox Content="Saturday" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Start Time -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Start Time:" Foreground="Black" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" Padding="8" Height="32" FontSize="12"/>
+                    </Grid>
+
+                    <!-- End Time -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="End Time:" Foreground="Black" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" Padding="8" Height="32" FontSize="12"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+
+            <!-- Notifications Section -->
+            <Border BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="15"
+                    Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Notifications"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="Black"
+                               Margin="0,0,0,15"/>
+
+                    <CheckBox Content="Enable SMS Reminder" Margin="0,0,0,12" VerticalAlignment="Center"/>
+                    <CheckBox Content="Enable Email Reminder" Margin="0,0,0,15" VerticalAlignment="Center"/>
+
+                    <TextBlock Text="Reminder Time Options:" FontWeight="SemiBold" Foreground="Black" Margin="0,0,0,8"/>
+                    <StackPanel Margin="20,0,0,0">
+                        <RadioButton Content="24 Hours Before" Margin="0,0,0,6"/>
+                        <RadioButton Content="2 Hours Before"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+
+            <!-- Online Booking Settings Section -->
+            <Border BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="15"
+                    Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Online Booking Settings"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="Black"
+                               Margin="0,0,0,15"/>
+
+                    <CheckBox Content="Allow Online Booking" Margin="0,0,0,12" VerticalAlignment="Center"/>
+                    <CheckBox Content="Require Appointment Approval" Margin="0,0,0,12" VerticalAlignment="Center"/>
+
+                    <Grid Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Limit Appointments Per Day:" Foreground="Black" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" Padding="8" Height="32" FontSize="12" Margin="0,0,20,0"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+
+            <!-- Permissions Section -->
+            <Border BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="15"
+                    Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Permissions"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="Black"
+                               Margin="0,0,0,15"/>
+
+                    <!-- Header Row -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Role" FontWeight="Bold" Foreground="Black"/>
+                        <TextBlock Grid.Column="1" Text="Create Appt" FontWeight="Bold" Foreground="Black"/>
+                        <TextBlock Grid.Column="2" Text="Edit Appt" FontWeight="Bold" Foreground="Black"/>
+                        <TextBlock Grid.Column="3" Text="Delete Appt" FontWeight="Bold" Foreground="Black"/>
+                        <TextBlock Grid.Column="4" Text="View Reports" FontWeight="Bold" Foreground="Black"/>
+                    </Grid>
+
+                    <!-- Admin Row -->
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Admin" Foreground="Black" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="1" IsChecked="True" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="2" IsChecked="True" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="3" IsChecked="True" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="4" IsChecked="True" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <!-- Receptionist Row -->
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Receptionist" Foreground="Black" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="1" IsChecked="True" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="2" IsChecked="True" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="3" IsChecked="False" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="4" IsChecked="False" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <!-- Doctor Row -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Doctor" Foreground="Black" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="1" IsChecked="False" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="2" IsChecked="False" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="3" IsChecked="False" VerticalAlignment="Center"/>
+                        <CheckBox Grid.Column="4" IsChecked="True" VerticalAlignment="Center"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+
+            <!-- Reports & Analytics Section -->
+            <Border BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="15"
+                    Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Reports &amp; Analytics (Preview)"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="Black"
+                               Margin="0,0,0,15"/>
+
+                    <Grid Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Card 1 -->
+                        <Border Grid.Column="0" BorderBrush="#E7F1FF" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,8,0" Background="#F9FAFB">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="Appointments Per Day" FontSize="12" FontWeight="SemiBold" Foreground="Black" TextAlignment="Center"/>
+                                <TextBlock Text="--" FontSize="18" FontWeight="Bold" Foreground="#4F7DF3" TextAlignment="Center" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card 2 -->
+                        <Border Grid.Column="1" BorderBrush="#E7F1FF" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,8,0" Background="#F9FAFB">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="No-show Rate" FontSize="12" FontWeight="SemiBold" Foreground="Black" TextAlignment="Center"/>
+                                <TextBlock Text="--" FontSize="18" FontWeight="Bold" Foreground="#EF4444" TextAlignment="Center" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card 3 -->
+                        <Border Grid.Column="2" BorderBrush="#E7F1FF" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,8,0" Background="#F9FAFB">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="Doctor Utilization" FontSize="12" FontWeight="SemiBold" Foreground="Black" TextAlignment="Center"/>
+                                <TextBlock Text="--" FontSize="18" FontWeight="Bold" Foreground="#10B981" TextAlignment="Center" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card 4 -->
+                        <Border Grid.Column="3" BorderBrush="#E7F1FF" BorderThickness="1" CornerRadius="4" Padding="10" Background="#F9FAFB">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="Revenue Summary" FontSize="12" FontWeight="SemiBold" Foreground="Black" TextAlignment="Center"/>
+                                <TextBlock Text="--" FontSize="18" FontWeight="Bold" Foreground="#8B5CF6" TextAlignment="Center" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+
+            <!-- Smart Scheduling Section -->
+            <Border BorderBrush="#E5E7EB"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="15"
+                    Margin="0,0,0,30">
+                <StackPanel>
+                    <TextBlock Text="Smart Scheduling (Preview)"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="Black"
+                               Margin="0,0,0,15"/>
+
+                    <CheckBox Content="Auto-fill gaps" Margin="0,0,0,8" VerticalAlignment="Center"/>
+                    <CheckBox Content="Prevent overbooking" Margin="0,0,0,8" VerticalAlignment="Center"/>
+                    <CheckBox Content="Enable patient waitlist" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+
             <!-- Info Message -->
-            <TextBlock Text="Note: Settings are not persisted. This is a placeholder UI for demonstration purposes."
+            <TextBlock Text="Note: These settings are UI placeholders for future development."
                        FontSize="11"
                        Foreground="#9CA3AF"
-                       Margin="0,20,0,0"
+                       Margin="0,0,0,20"
                        TextWrapping="Wrap"
                        FontStyle="Italic"/>
         </StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

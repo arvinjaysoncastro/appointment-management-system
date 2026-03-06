@@ -34,7 +34,14 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         public DateTime SelectedDate
         {
             get => _selectedDate;
-            set => SetProperty(ref _selectedDate, value);
+            set
+            {
+                if (SetProperty(ref _selectedDate, value))
+                {
+                    // Auto-reload appointments when date is changed
+                    _ = LoadAppointmentsAsync();
+                }
+            }
         }
 
         public bool IsLoading
@@ -82,6 +89,9 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             CloseDrawerCommand = new RelayCommand(_ => CloseDrawer());
             EditAppointmentCommand = new RelayCommand<AppointmentItemViewModel>(EditAppointment);
             DeleteAppointmentCommand = new RelayCommand<AppointmentItemViewModel>(DeleteAppointment);
+
+            // Auto-load appointments for today on initialization
+            _ = LoadAppointmentsAsync();
         }
 
         private async System.Threading.Tasks.Task LoadAppointmentsAsync()

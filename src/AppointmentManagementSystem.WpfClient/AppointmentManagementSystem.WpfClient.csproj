@@ -56,6 +56,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DateTimeOffsetToDateTimeConverter.cs" />
+    <Compile Include="NotNullToVisibilityConverter.cs" />
+    <Compile Include="NullToVisibilityConverter.cs" />
+    <Compile Include="SelectedAppointmentToHeaderConverter.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="Views\PeopleView.xaml.cs">
       <DependentUpon>PeopleView.xaml</DependentUpon>

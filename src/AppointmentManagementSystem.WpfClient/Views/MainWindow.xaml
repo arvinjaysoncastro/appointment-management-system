@@ -7,8 +7,7 @@
         xmlns:views="clr-namespace:AppointmentManagementSystem.WpfClient.Views"
         mc:Ignorable="d"
         Title="Appointment Management System" Height="700" Width="1200" WindowStartupLocation="CenterScreen"
-        WindowStyle="None"
-        ResizeMode="NoResize">
+        ResizeMode="CanResize">
     <Grid Background="{StaticResource AppBackground}" MouseDown="WindowDrag">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="220"/>
