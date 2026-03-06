@@ -140,11 +140,19 @@ namespace AppointmentManagementSystem.WpfClient
                 return new AppointmentApiClient(httpClient);
             });
 
+            // Register AppointmentCreateViewModel (transient - new instance each time)
+            services.AddTransient<AppointmentCreateViewModel>(provider =>
+            {
+                var apiClient = provider.GetRequiredService<IAppointmentApiClient>();
+                return new AppointmentCreateViewModel(apiClient);
+            });
+
             // Register AppointmentListViewModel (transient - new instance each time)
             services.AddTransient<AppointmentListViewModel>(provider =>
             {
                 var apiClient = provider.GetRequiredService<IAppointmentApiClient>();
-                return new AppointmentListViewModel(apiClient);
+                var createViewModel = provider.GetRequiredService<AppointmentCreateViewModel>();
+                return new AppointmentListViewModel(apiClient, createViewModel);
             });
 
             // Register MainWindow as singleton (created once via DI)

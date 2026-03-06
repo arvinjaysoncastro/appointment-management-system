@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
 using AppointmentManagementSystem.WpfClient.Services;
+using AppointmentManagementSystem.WpfClient.Views;
 
 namespace AppointmentManagementSystem.WpfClient.ViewModels
 {
@@ -14,6 +15,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
     public class AppointmentListViewModel : ViewModelBase
     {
         private readonly IAppointmentApiClient _appointmentApiClient;
+        private readonly AppointmentCreateViewModel _createViewModel;
         private ObservableCollection<AppointmentItemViewModel> _appointments;
         private bool _isLoading;
         private string _errorMessage;
@@ -39,12 +41,13 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         public ICommand LoadAppointmentsCommand { get; }
         public ICommand AddAppointmentCommand { get; }
 
-        public AppointmentListViewModel(IAppointmentApiClient appointmentApiClient)
+        public AppointmentListViewModel(IAppointmentApiClient appointmentApiClient, AppointmentCreateViewModel createViewModel)
         {
             _appointmentApiClient = appointmentApiClient ?? throw new ArgumentNullException(nameof(appointmentApiClient));
+            _createViewModel = createViewModel ?? throw new ArgumentNullException(nameof(createViewModel));
             Appointments = new ObservableCollection<AppointmentItemViewModel>();
             LoadAppointmentsCommand = new AsyncRelayCommand(LoadAppointmentsAsync);
-            AddAppointmentCommand = new RelayCommand(_ => AddAppointment());
+            AddAppointmentCommand = new RelayCommand(_ => ShowCreateAppointmentDialog());
         }
 
         private async System.Threading.Tasks.Task LoadAppointmentsAsync()
@@ -81,10 +84,26 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             }
         }
 
-        private void AddAppointment()
+        private void ShowCreateAppointmentDialog()
         {
-            // TODO: Navigate to appointment creation view
-            // Implementation deferred
+            // Reset the create view model
+            _createViewModel.PatientId = Guid.Empty;
+            _createViewModel.Title = string.Empty;
+            _createViewModel.Notes = string.Empty;
+            _createViewModel.StartTime = DateTimeOffset.Now.Date.AddHours(9);
+            _createViewModel.EndTime = DateTimeOffset.Now.Date.AddHours(10);
+            _createViewModel.ErrorMessage = string.Empty;
+
+            // Create and show dialog
+            var view = new AppointmentCreateView(_createViewModel);
+            var result = view.ShowDialog();
+
+            // If dialog was successful, refresh the list
+            if (result == true)
+            {
+                // Refresh appointments list
+                _ = LoadAppointmentsAsync();
+            }
         }
     }
 

@@ -55,6 +55,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Views\AppointmentCreateView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\AppointmentListView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -65,12 +68,17 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BooleanInvertConverter.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Infrastructure\ViewModelBase.cs" />
     <Compile Include="InvertBooleanToVisibilityConverter.cs" />
     <Compile Include="Services\AppointmentApiClient.cs" />
     <Compile Include="StringToVisibilityConverter.cs" />
+    <Compile Include="ViewModels\AppointmentCreateViewModel.cs" />
     <Compile Include="ViewModels\AppointmentListViewModel.cs" />
+    <Compile Include="Views\AppointmentCreateView.xaml.cs">
+      <DependentUpon>AppointmentCreateView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\AppointmentListView.xaml.cs">
       <DependentUpon>AppointmentListView.xaml</DependentUpon>
     </Compile>

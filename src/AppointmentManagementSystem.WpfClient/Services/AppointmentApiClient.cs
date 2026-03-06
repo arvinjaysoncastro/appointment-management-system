@@ -13,6 +13,7 @@ namespace AppointmentManagementSystem.WpfClient.Services
     public interface IAppointmentApiClient
     {
         Task<List<AppointmentSummaryDto>> GetAppointmentsAsync(DateTime date);
+        Task<AppointmentDetailsDto> CreateAppointmentAsync(CreateAppointmentDto dto);
     }
 
     public class AppointmentApiClient : IAppointmentApiClient
@@ -48,6 +49,60 @@ namespace AppointmentManagementSystem.WpfClient.Services
                 throw new InvalidOperationException($"Error deserializing API response: {ex.Message}", ex);
             }
         }
+
+        public async Task<AppointmentDetailsDto> CreateAppointmentAsync(CreateAppointmentDto dto)
+        {
+            try
+            {
+                // TODO: Implement JSON serialization for request body
+                // For now, return a placeholder response
+                var result = new AppointmentDetailsDto
+                {
+                    Id = Guid.NewGuid(),
+                    PatientId = dto.PatientId,
+                    PatientName = string.Empty,
+                    Title = dto.Title,
+                    StartTime = dto.StartTime,
+                    EndTime = dto.EndTime,
+                    Notes = dto.Notes
+                };
+                return result;
+            }
+            catch (HttpRequestException ex)
+            {
+                throw new InvalidOperationException($"Failed to create appointment: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Error creating appointment: {ex.Message}", ex);
+            }
+        }
+    }
+
+    /// <summary>
+    /// DTO for creating a new appointment
+    /// </summary>
+    public class CreateAppointmentDto
+    {
+        public Guid PatientId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Notes { get; set; } = string.Empty;
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
+    }
+
+    /// <summary>
+    /// DTO for appointment details response
+    /// </summary>
+    public class AppointmentDetailsDto
+    {
+        public Guid Id { get; set; }
+        public Guid PatientId { get; set; }
+        public string PatientName { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Notes { get; set; } = string.Empty;
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
     }
 
     /// <summary>
