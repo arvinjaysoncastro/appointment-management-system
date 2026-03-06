@@ -130,8 +130,14 @@ namespace AppointmentManagementSystem.WpfClient
 
         private void ConfigureServices(ServiceCollection services)
         {
-            // Register HttpClient as singleton
-            services.AddSingleton<HttpClient>(new HttpClient());
+            // Register HttpClient as singleton with proper HTTPS handling for development
+            var httpHandler = new HttpClientHandler();
+            #if DEBUG
+            // Allow self-signed certificates in development only
+            httpHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+            #endif
+            var configuredHttpClient = new HttpClient(httpHandler);
+            services.AddSingleton(configuredHttpClient);
 
             // Register AppointmentApiClient (transient - new instance each time)
             services.AddTransient<IAppointmentApiClient>(provider =>

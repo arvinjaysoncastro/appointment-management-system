@@ -17,10 +17,11 @@ public sealed class AppointmentController : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<AppointmentSummaryDto>>> Search(
-        [FromQuery] DateTime date,
+        [FromQuery] DateTime? date,
         CancellationToken cancellationToken)
     {
-        var appointments = await _appointmentService.SearchAsync(date, cancellationToken);
+        var searchDate = date ?? DateTime.Now.Date;
+        var appointments = await _appointmentService.SearchAsync(searchDate, cancellationToken);
         return Ok(appointments);
     }
 

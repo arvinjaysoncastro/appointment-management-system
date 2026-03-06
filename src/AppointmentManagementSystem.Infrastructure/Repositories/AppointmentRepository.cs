@@ -20,26 +20,33 @@ public sealed class AppointmentRepository : IAppointmentRepository
         return await _dbContext.Appointments.FindAsync(new object[] { id }, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<AppointmentSummaryDto>> SearchAsync(DateTimeOffset date, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<AppointmentSummaryDto>> SearchAsync(
+        DateTimeOffset date,
+        CancellationToken cancellationToken)
     {
-        var start = date.Date;
+        var start = new DateTimeOffset(date.DateTime.Date, date.Offset);
         var end = start.AddDays(1);
 
-        var query = from a in _dbContext.Appointments.AsNoTracking()
-                    join p in _dbContext.Patients.AsNoTracking() on a.PatientId equals p.Id
-                    where a.StartTime >= start && a.StartTime < end
-                    orderby a.StartTime
-                    select new AppointmentSummaryDto
-                    {
-                        Id = a.Id,
-                        PatientId = a.PatientId,
-                        PatientName = p.FirstName + " " + p.LastName,
-                        StartTime = a.StartTime,
-                        EndTime = a.EndTime,
-                        Title = a.Title
-                    };
+        var appointments = await _dbContext.Appointments
+            .AsNoTracking()
+            //.Include(a => a.Patient)
+            .ToListAsync(cancellationToken);
 
-        return await query.ToListAsync(cancellationToken);
+        return appointments
+            .Where(a => a.StartTime >= start && a.StartTime < end)
+            .Select(a => new AppointmentSummaryDto
+            {
+                Id = a.Id,
+                PatientId = a.PatientId,
+                //PatientName = a.Patient != null
+                //    ? a.Patient.FirstName + " " + a.Patient.LastName
+                //    : string.Empty,
+                Title = a.Title,
+                StartTime = a.StartTime,
+                EndTime = a.EndTime
+            })
+            .OrderBy(a => a.StartTime)
+            .ToList();
     }
 
     public async Task AddAsync(Appointment appointment, CancellationToken cancellationToken)

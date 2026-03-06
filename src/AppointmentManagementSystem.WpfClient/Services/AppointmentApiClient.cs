@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Net.Http;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace AppointmentManagementSystem.WpfClient.Services
@@ -12,34 +16,30 @@ namespace AppointmentManagementSystem.WpfClient.Services
     /// </summary>
     public interface IAppointmentApiClient
     {
-        Task<List<AppointmentSummaryDto>> GetAppointmentsAsync(DateTime date);
+        Task<List<AppointmentSummaryDto>> GetAppointmentsAsync(DateTime? date = null);
         Task<AppointmentDetailsDto> CreateAppointmentAsync(CreateAppointmentDto dto);
-        Task DeleteAppointmentAsync(Guid id);
     }
 
     public class AppointmentApiClient : IAppointmentApiClient
     {
         private readonly HttpClient _httpClient;
-        private const string BaseUrl = "http://localhost:5000/api/appointments";
+        private const string BaseUrl = "https://localhost:7017/api/appointments";
 
         public AppointmentApiClient(HttpClient httpClient)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        public async Task<List<AppointmentSummaryDto>> GetAppointmentsAsync(DateTime date)
+        public async Task<List<AppointmentSummaryDto>> GetAppointmentsAsync(DateTime? date = null)
         {
             try
             {
-                var url = $"{BaseUrl}?date={date:O}";
+                var url = date.HasValue ? $"{BaseUrl}?date={date:yyyy-MM-dd}" : BaseUrl;
                 var response = await _httpClient.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
-                
-                // TODO: Implement proper JSON deserialization
-                // For now, return empty list. Can use DataContractJsonSerializer or HttpClient.GetFromJsonAsync
-                return new List<AppointmentSummaryDto>();
+                return SimpleJsonParser.ParseAppointmentList(content);
             }
             catch (HttpRequestException ex)
             {
@@ -55,19 +55,14 @@ namespace AppointmentManagementSystem.WpfClient.Services
         {
             try
             {
-                // TODO: Implement JSON serialization for request body
-                // For now, return a placeholder response
-                var result = new AppointmentDetailsDto
-                {
-                    Id = Guid.NewGuid(),
-                    PatientId = dto.PatientId,
-                    PatientName = string.Empty,
-                    Title = dto.Title,
-                    StartTime = dto.StartTime,
-                    EndTime = dto.EndTime,
-                    Notes = dto.Notes
-                };
-                return result;
+                var json = SimpleJsonParser.SerializeCreateAppointmentDto(dto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                
+                var response = await _httpClient.PostAsync(BaseUrl, content);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return SimpleJsonParser.ParseAppointmentDetails(responseContent);
             }
             catch (HttpRequestException ex)
             {
@@ -78,23 +73,117 @@ namespace AppointmentManagementSystem.WpfClient.Services
                 throw new InvalidOperationException($"Error creating appointment: {ex.Message}", ex);
             }
         }
+    }
 
-        public async Task DeleteAppointmentAsync(Guid id)
+    /// <summary>
+    /// Simple JSON parser for .NET Framework 4.8 compatibility (no external dependencies)
+    /// </summary>
+    internal static class SimpleJsonParser
+    {
+        public static List<AppointmentSummaryDto> ParseAppointmentList(string json)
         {
-            try
+            var list = new List<AppointmentSummaryDto>();
+            var appointments = Regex.Matches(json, @"\{[^}]*\}");
+
+            foreach (Match match in appointments)
             {
-                var url = $"{BaseUrl}/{id}";
-                var response = await _httpClient.DeleteAsync(url);
-                response.EnsureSuccessStatusCode();
+                var dto = ParseAppointmentSummary(match.Value);
+                if (dto != null)
+                    list.Add(dto);
             }
-            catch (HttpRequestException ex)
+
+            return list;
+        }
+
+        public static AppointmentSummaryDto ParseAppointmentSummary(string json)
+        {
+            return new AppointmentSummaryDto
             {
-                throw new InvalidOperationException($"Failed to delete appointment: {ex.Message}", ex);
-            }
-            catch (Exception ex)
+                Id = ExtractGuid(json, "id"),
+                PatientId = ExtractGuid(json, "patientId"),
+                PatientName = ExtractString(json, "patientName"),
+                Title = ExtractString(json, "title"),
+                StartTime = ExtractDateTimeOffset(json, "startTime"),
+                EndTime = ExtractDateTimeOffset(json, "endTime")
+            };
+        }
+
+        public static AppointmentDetailsDto ParseAppointmentDetails(string json)
+        {
+            return new AppointmentDetailsDto
             {
-                throw new InvalidOperationException($"Error deleting appointment: {ex.Message}", ex);
+                Id = ExtractGuid(json, "id"),
+                PatientId = ExtractGuid(json, "patientId"),
+                PatientName = ExtractString(json, "patientName"),
+                Title = ExtractString(json, "title"),
+                Notes = ExtractString(json, "notes"),
+                StartTime = ExtractDateTimeOffset(json, "startTime"),
+                EndTime = ExtractDateTimeOffset(json, "endTime")
+            };
+        }
+
+        public static string SerializeCreateAppointmentDto(CreateAppointmentDto dto)
+        {
+            var sb = new StringBuilder();
+            sb.Append("{");
+            sb.Append($"\"patientId\":\"{dto.PatientId}\", ");
+            sb.Append($"\"title\":\"{EscapeJsonString(dto.Title)}\", ");
+            sb.Append($"\"notes\":\"{EscapeJsonString(dto.Notes)}\", ");
+            sb.Append($"\"startTime\":\"{dto.StartTime:O}\", ");
+            sb.Append($"\"endTime\":\"{dto.EndTime:O}\"");
+            sb.Append("}");
+            return sb.ToString();
+        }
+
+        private static Guid ExtractGuid(string json, string key)
+        {
+            var pattern = $"\"{key}\":\"([^\"]+)\"";
+            var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase);
+            return match.Success && Guid.TryParse(match.Groups[1].Value, out var result) ? result : Guid.Empty;
+        }
+
+        private static string ExtractString(string json, string key)
+        {
+            var pattern = $"\"{key}\":\"([^\"]*)\"";
+            var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase);
+            return match.Success ? UnescapeJsonString(match.Groups[1].Value) : string.Empty;
+        }
+
+        private static DateTimeOffset ExtractDateTimeOffset(string json, string key)
+        {
+            var pattern = $"\"{key}\":\"([^\"]+)\"";
+            var match = Regex.Match(json, pattern, RegexOptions.IgnoreCase);
+            if (match.Success && DateTimeOffset.TryParse(match.Groups[1].Value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var result))
+            {
+                return result;
             }
+            return DateTimeOffset.Now;
+        }
+
+        private static string EscapeJsonString(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return string.Empty;
+
+            return value
+                .Replace("\\", "\\\\")
+                .Replace("\"", "\\\"")
+                .Replace("\n", "\\n")
+                .Replace("\r", "\\r")
+                .Replace("\t", "\\t");
+        }
+
+        private static string UnescapeJsonString(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return string.Empty;
+
+            return value
+                .Replace("\\\"", "\"")
+                .Replace("\\\\", "\\")
+                .Replace("\\n", "\n")
+                .Replace("\\r", "\r")
+                .Replace("\\t", "\t");
         }
     }
 

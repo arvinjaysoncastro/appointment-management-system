@@ -4,6 +4,7 @@ public sealed class Appointment
 {
     public Guid Id { get; }
     public Guid PatientId { get; }
+    //public Patient? Patient { get; set; }
     public string Title { get; private set; } = string.Empty;
     public DateTimeOffset StartTime { get; private set; }
     public DateTimeOffset EndTime { get; private set; }

@@ -103,13 +103,18 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                     return;
                 }
 
+                // Ensure proper DateTimeOffset conversion
+                // If the DateTime is unspecified or UTC, treat as Local for user input
+                var startOffset = ConvertToDateTimeOffset(StartTime);
+                var endOffset = ConvertToDateTimeOffset(EndTime);
+
                 var dto = new CreateAppointmentDto
                 {
                     PatientId = PatientId,
                     Title = Title,
                     Notes = Notes,
-                    StartTime = StartTime,
-                    EndTime = EndTime
+                    StartTime = startOffset,
+                    EndTime = endOffset
                 };
 
                 var result = await _appointmentApiClient.CreateAppointmentAsync(dto);
@@ -123,6 +128,25 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             {
                 IsSubmitting = false;
             }
+        }
+
+        private DateTimeOffset ConvertToDateTimeOffset(DateTimeOffset offset)
+        {
+            // If the offset is already properly configured (non-UTC or with correct offset), use it as-is
+            if (offset.Offset != TimeSpan.Zero)
+                return offset;
+
+            // If it's UTC but originated from local input, convert it back to local time
+            // This handles the case where DateTime.SpecifyKind(dt, DateTimeKind.Local) was used
+            var dt = offset.DateTime;
+            if (dt.Kind == DateTimeKind.Utc)
+            {
+                // Convert back to local time
+                var localDt = DateTime.SpecifyKind(dt, DateTimeKind.Local);
+                return new DateTimeOffset(localDt);
+            }
+
+            return offset;
         }
 
         private void OnCancelled()
