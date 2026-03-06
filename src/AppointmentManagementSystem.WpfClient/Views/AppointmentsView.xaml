@@ -68,8 +68,8 @@
                         BorderThickness="0"
                         Cursor="Hand">
 					<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-						<TextBlock Text="+" FontSize="18" FontWeight="Bold" Margin="0,0,8,0"/>
-						<TextBlock Text="Appointment" VerticalAlignment="Center"/>
+						<TextBlock Text="+" FontSize="18" FontWeight="Bold" Margin="0,0,8,0" Foreground="White"/>
+						<TextBlock Text="Appointment" VerticalAlignment="Center" Foreground="White"/>
 					</StackPanel>
 				</Button>
 			</Border>
@@ -177,16 +177,13 @@
                                                     FontSize="14"/>
 
 												<TextBlock
-                                                    Text="{Binding StartTime, StringFormat={}{0:HH:mm}}"
                                                     Margin="0,6,0,0"
                                                     FontSize="13"
-                                                    Foreground="Black"/>
-
-												<TextBlock
-                                                    Text="{Binding EndTime, StringFormat=Ends: {0:HH:mm}}"
-                                                    Margin="0,2,0,0"
-                                                    FontSize="13"
-                                                    Foreground="Black"/>
+                                                    Foreground="Black">
+													<Run Text="{Binding StartTime, StringFormat={}{0:HH:mm}, Mode=OneWay}"/>
+													<Run Text=" to "/>
+													<Run Text="{Binding EndTime, StringFormat={}{0:HH:mm}, Mode=OneWay}"/>
+												</TextBlock>
 
 											</StackPanel>
 
@@ -301,22 +298,54 @@
                                Margin="0,0,0,6"
                                Foreground="Black"
                                FontWeight="SemiBold"/>
-					<DatePicker SelectedDate="{Binding CreateViewModel.StartTime, Mode=TwoWay, Converter={StaticResource DateTimeOffsetToDateTimeConverter}}"
-                                Margin="0,0,0,14"
-                                Padding="8,6"
-                                Foreground="Black"
-                                Background="White"/>
+					<Grid Margin="0,0,0,14">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="100"/>
+						</Grid.ColumnDefinitions>
+						<DatePicker Grid.Column="0"
+                                    SelectedDate="{Binding CreateViewModel.StartTime, Mode=TwoWay, Converter={StaticResource DateTimeOffsetToDateTimeConverter}}"
+                                    Padding="8,6"
+                                    Foreground="Black"
+                                    Background="White"
+                                    Margin="0,0,8,0"/>
+						<TextBox Grid.Column="1"
+                                 Text="00:00"
+                                 Padding="8,6"
+                                 Foreground="Black"
+                                 Background="White"
+                                 BorderBrush="#D1D5DB"
+                                 BorderThickness="1"
+                                 TextAlignment="Center"
+                                 ToolTip="HH:MM format"/>
+					</Grid>
 
 					<!-- End Time Field -->
 					<TextBlock Text="End Time"
                                Margin="0,0,0,6"
                                Foreground="Black"
                                FontWeight="SemiBold"/>
-					<DatePicker SelectedDate="{Binding CreateViewModel.EndTime, Mode=TwoWay, Converter={StaticResource DateTimeOffsetToDateTimeConverter}}"
-                                Margin="0,0,0,14"
-                                Padding="8,6"
-                                Foreground="Black"
-                                Background="White"/>
+					<Grid Margin="0,0,0,14">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="100"/>
+						</Grid.ColumnDefinitions>
+						<DatePicker Grid.Column="0"
+                                    SelectedDate="{Binding CreateViewModel.EndTime, Mode=TwoWay, Converter={StaticResource DateTimeOffsetToDateTimeConverter}}"
+                                    Padding="8,6"
+                                    Foreground="Black"
+                                    Background="White"
+                                    Margin="0,0,8,0"/>
+						<TextBox Grid.Column="1"
+                                 Text="00:00"
+                                 Padding="8,6"
+                                 Foreground="Black"
+                                 Background="White"
+                                 BorderBrush="#D1D5DB"
+                                 BorderThickness="1"
+                                 TextAlignment="Center"
+                                 ToolTip="HH:MM format"/>
+					</Grid>
 
 					<!-- Notes Field -->
 					<TextBlock Text="Notes"

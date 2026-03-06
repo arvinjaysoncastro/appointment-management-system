@@ -6,38 +6,205 @@
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="900">
     <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="380"/>
+        </Grid.ColumnDefinitions>
+
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Page Header -->
-        <TextBlock Grid.Row="0"
-                   Text="Patients"
-                   FontSize="24"
-                   FontWeight="Bold"
-                   Foreground="Black"
-                   Margin="20,20,20,10"/>
+        <!-- HEADER SECTION -->
+        <Grid Grid.Row="0" Grid.Column="0" Margin="20,20,20,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-        <!-- Patients DataGrid -->
-        <DataGrid Grid.Row="1"
-                  ItemsSource="{Binding People}"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  Margin="20"
-                  BorderThickness="1"
-                  BorderBrush="#E5E7EB">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Name" 
-                                    Binding="{Binding Name}" 
-                                    Width="250"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn Header="Patient ID" 
-                                    Binding="{Binding PatientId}" 
-                                    Width="300"
-                                    IsReadOnly="True"/>
-            </DataGrid.Columns>
-        </DataGrid>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Patients" FontSize="28" FontWeight="Bold" Foreground="Black"/>
+                    <Border Background="#F59E0B" CornerRadius="6" Padding="6,2" Margin="10,4,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="SOON" Foreground="White" FontSize="11" FontWeight="Bold"/>
+                    </Border>
+                </StackPanel>
+                <TextBlock Text="Manage and view patient records." FontSize="14" Foreground="#6B7280" Margin="0,6,0,0"/>
+            </StackPanel>
+
+            <Button Grid.Column="1" Content="+ Add Patient" Padding="16,10" Background="#4F7DF3" Foreground="White" FontWeight="SemiBold" FontSize="13" BorderThickness="0" Cursor="Hand" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- STATISTICS CARDS -->
+        <Grid Grid.Row="1" Grid.Column="0" Margin="20,20,20,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Total Patients Card -->
+            <Border Margin="0,0,12,0" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="10" Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Total Patients" FontSize="12" Foreground="#6B7280" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <TextBlock Text="{Binding PeopleCount, FallbackValue=125}" FontSize="32" FontWeight="Bold" Foreground="Black"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Active Patients Card -->
+            <Border Grid.Column="1" Margin="6,0,6,0" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="10" Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Active Patients" FontSize="12" Foreground="#6B7280" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <TextBlock Text="98" FontSize="32" FontWeight="Bold" Foreground="Black"/>
+                </StackPanel>
+            </Border>
+
+            <!-- New This Month Card -->
+            <Border Grid.Column="2" Margin="12,0,0,0" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="10" Padding="20">
+                <StackPanel>
+                    <TextBlock Text="New This Month" FontSize="12" Foreground="#6B7280" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <TextBlock Text="12" FontSize="32" FontWeight="Bold" Foreground="Black"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- SEARCH AND FILTER BAR -->
+        <Grid Grid.Row="2" Grid.Column="0" Margin="20,20,20,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Search TextBox -->
+            <Border Grid.Column="0" Background="White" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,12,0">
+                <TextBox Background="Transparent" Foreground="Black" BorderThickness="0" FontSize="13" Text="Search Patients..." Padding="0"/>
+            </Border>
+
+            <!-- Status Filter ComboBox -->
+            <ComboBox Grid.Column="1" Background="White" Foreground="Black" BorderBrush="#D1D5DB" BorderThickness="1" Padding="10,8" FontSize="13" Margin="0,0,12,0">
+                <ComboBoxItem Content="All" IsSelected="True"/>
+                <ComboBoxItem Content="Active"/>
+                <ComboBoxItem Content="Inactive"/>
+                <ComboBoxItem Content="Archived"/>
+            </ComboBox>
+
+            <!-- Refresh Button -->
+            <Button Grid.Column="2" Content="?" Width="40" Height="40" Padding="8,8" Background="#E5E7EB" Foreground="White" FontWeight="Bold" FontSize="16" BorderThickness="0" Cursor="Hand" ToolTip="Refresh Patients"/>
+        </Grid>
+
+        <!-- MAIN CONTENT AREA -->
+        <Grid Grid.Row="3" Grid.Column="0" Margin="20,20,20,20">
+
+            <!-- PATIENTS DATAGRID -->
+            <DataGrid ItemsSource="{Binding People}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" BorderThickness="1" BorderBrush="#E5E7EB" RowBackground="White" AlternatingRowBackground="#F9FAFB" ColumnHeaderHeight="45" RowHeight="55">
+                <DataGrid.Columns>
+                    <!-- Avatar Column -->
+                    <DataGridTemplateColumn Header="" Width="60" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="#4F7DF3" CornerRadius="20" Width="40" Height="40" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Foreground="White" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" Text="?"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Name Column -->
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="180" IsReadOnly="True"/>
+
+                    <!-- Patient ID Column -->
+                    <DataGridTextColumn Header="Patient ID" Binding="{Binding PatientId}" Width="280" IsReadOnly="True"/>
+
+                    <!-- Phone Column -->
+                    <DataGridTextColumn Header="Phone" Binding="{Binding Phone, FallbackValue=-}" Width="120" IsReadOnly="True"/>
+
+                    <!-- Email Column -->
+                    <DataGridTextColumn Header="Email" Binding="{Binding Email, FallbackValue=-}" Width="160" IsReadOnly="True"/>
+
+                    <!-- Last Visit Column -->
+                    <DataGridTextColumn Header="Last Visit" Binding="{Binding LastVisit, StringFormat=MMM d yyyy, FallbackValue=-}" Width="100" IsReadOnly="True"/>
+
+                    <!-- Status Column -->
+                    <DataGridTemplateColumn Header="Status" Width="100" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="#D1FAE5" CornerRadius="4" Padding="8,4" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Active" Foreground="#065F46" FontSize="12" FontWeight="SemiBold" TextAlignment="Center"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Actions Column -->
+                    <DataGridTemplateColumn Header="Actions" Width="120" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <Button Content="View" Padding="8,4" Background="Transparent" Foreground="#4F7DF3" FontSize="12" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand" Margin="0,0,6,0"/>
+                                    <Button Content="Edit" Padding="8,4" Background="Transparent" Foreground="#4F7DF3" FontSize="12" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- RIGHT PANEL DRAWER -->
+        <Border Grid.Row="0" Grid.RowSpan="4" Grid.Column="1" Background="White" BorderBrush="#E5E7EB" BorderThickness="1,0,0,0" Visibility="Collapsed" Padding="20">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- Header -->
+                    <TextBlock Text="Patient Details" FontSize="18" FontWeight="Bold" Foreground="Black" Margin="0,0,0,20"/>
+
+                    <!-- Avatar -->
+                    <Border Background="#4F7DF3" CornerRadius="60" Width="100" Height="100" Margin="0,0,0,20" HorizontalAlignment="Center">
+                        <TextBlock Text="?" Foreground="White" FontWeight="Bold" FontSize="40" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+
+                    <!-- Patient Name -->
+                    <TextBlock Text="Patient Name" FontSize="12" Foreground="#6B7280" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBlock Text="John Smith" FontSize="16" FontWeight="SemiBold" Foreground="Black" Margin="0,0,0,16"/>
+
+                    <!-- Patient ID -->
+                    <TextBlock Text="Patient ID" FontSize="12" Foreground="#6B7280" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBlock Text="0000000-0000-0000-0000-000000000001" FontSize="13" Foreground="Black" Margin="0,0,0,16" TextWrapping="Wrap"/>
+
+                    <!-- Phone -->
+                    <TextBlock Text="Phone" FontSize="12" Foreground="#6B7280" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBlock Text="+1 555-123-4567" FontSize="13" Foreground="Black" Margin="0,0,0,16"/>
+
+                    <!-- Email -->
+                    <TextBlock Text="Email" FontSize="12" Foreground="#6B7280" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBlock Text="john.smith@email.com" FontSize="13" Foreground="Black" Margin="0,0,0,16"/>
+
+                    <!-- Address -->
+                    <TextBlock Text="Address" FontSize="12" Foreground="#6B7280" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBlock Text="123 Main St, City, State 12345" FontSize="13" Foreground="Black" Margin="0,0,0,16" TextWrapping="Wrap"/>
+
+                    <!-- Date of Birth -->
+                    <TextBlock Text="Date of Birth" FontSize="12" Foreground="#6B7280" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBlock Text="Jan 15, 1990" FontSize="13" Foreground="Black" Margin="0,0,0,16"/>
+
+                    <!-- Last Visit -->
+                    <TextBlock Text="Last Visit" FontSize="12" Foreground="#6B7280" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBlock Text="Mar 3, 2026" FontSize="13" Foreground="Black" Margin="0,0,0,16"/>
+
+                    <!-- Notes -->
+                    <TextBlock Text="Notes" FontSize="12" Foreground="#6B7280" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBlock Text="Patient has mild allergies to penicillin. Prefers morning appointments." FontSize="13" Foreground="Black" Margin="0,0,0,20" TextWrapping="Wrap"/>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Margin="0,20,0,0">
+                        <Button Content="Edit Patient" Padding="12,10" Background="#4F7DF3" Foreground="White" FontWeight="SemiBold" FontSize="13" BorderThickness="0" Cursor="Hand" Margin="0,0,0,10"/>
+                        <Button Content="Schedule Appointment" Padding="12,10" Background="#10B981" Foreground="White" FontWeight="SemiBold" FontSize="13" BorderThickness="0" Cursor="Hand"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
     </Grid>
 </UserControl>

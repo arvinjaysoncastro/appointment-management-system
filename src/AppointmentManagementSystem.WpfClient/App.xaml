@@ -19,7 +19,7 @@
         <SolidColorBrush x:Key="SidebarBackgroundTop" Color="#1B1E24"/>
         <SolidColorBrush x:Key="SidebarBackgroundBottom" Color="#111318"/>
         <SolidColorBrush x:Key="AccentColor" Color="#4F7DF3"/>
-        <SolidColorBrush x:Key="TextPrimary" Color="White"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="Black"/>
         <SolidColorBrush x:Key="TextSecondary" Color="#9CA3AF"/>
 
         <!-- Sidebar Button Style -->
@@ -49,11 +49,20 @@
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter Property="Background" Value="#4F7DF3"/>
+                                <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <!-- Accent Button Style (for colored background buttons) -->
+        <Style x:Key="AccentButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
         <!-- Light DataGrid Style -->
@@ -86,7 +95,7 @@
 
         <!-- TextBlock Style for content -->
         <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="Foreground" Value="Black"/>
         </Style>
 
         <!-- Light TextBox Style -->
