@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AppointmentManagementSystem.WpfClient.Services
 {
@@ -18,7 +19,7 @@ namespace AppointmentManagementSystem.WpfClient.Services
     /// </summary>
     public sealed class NavigationService : INavigationService
     {
-        private readonly AppointmentManagementSystem.WpfClient.IServiceProvider _serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
         private readonly Dictionary<Type, Type> _viewMappings = new Dictionary<Type, Type>();
         private object _currentViewModel;
 
@@ -26,7 +27,7 @@ namespace AppointmentManagementSystem.WpfClient.Services
 
         public event EventHandler CurrentViewModelChanged;
 
-        public NavigationService(AppointmentManagementSystem.WpfClient.IServiceProvider serviceProvider)
+        public NavigationService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }

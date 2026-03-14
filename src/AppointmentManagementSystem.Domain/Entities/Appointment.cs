@@ -4,35 +4,48 @@ namespace AppointmentManagementSystem.Domain.Entities;
 
 public sealed class Appointment
 {
-    public Guid Id { get; }
-    public string Title { get; }
-    public DateTime Start { get; }
-    public DateTime End { get; }
+    public Guid Id { get; private set; }
+    public string Title { get; private set; } = string.Empty;
+    public string Description { get; private set; } = string.Empty;
+    public DateTime Start { get; private set; }
+    public DateTime End { get; private set; }
 
-    public Appointment(Guid id, string title, DateTime start, DateTime end)
+    private Appointment()
+    {
+        Title = string.Empty;
+        Description = string.Empty;
+    }
+
+    public Appointment(string title, string description, DateTime start, DateTime end)
+        : this(Guid.NewGuid(), title, description, start, end)
+    {
+    }
+
+    public Appointment(Guid id, string title, string description, DateTime start, DateTime end)
     {
         if (id == Guid.Empty)
         {
             throw new DomainException("Appointment id is required.");
         }
 
+        Id = id;
+        SetDetails(title, description, start, end);
+    }
+
+    public void SetDetails(string title, string description, DateTime start, DateTime end)
+    {
         if (string.IsNullOrWhiteSpace(title))
         {
             throw new DomainException("Appointment title is required.");
         }
 
-        if (start >= end)
+        if (end <= start)
         {
-            throw new DomainException("Appointment start must be before end.");
+            throw new DomainException("Appointment end must be after start.");
         }
 
-        if (start < DateTime.UtcNow)
-        {
-            throw new DomainException("Appointment cannot be scheduled in the past.");
-        }
-
-        Id = id;
         Title = title.Trim();
+        Description = (description ?? string.Empty).Trim();
         Start = start;
         End = end;
     }

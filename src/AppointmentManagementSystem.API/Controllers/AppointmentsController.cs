@@ -1,6 +1,5 @@
 using AppointmentManagementSystem.Application.DTOs;
 using AppointmentManagementSystem.Application.Interfaces;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentManagementSystem.API.Controllers;
@@ -42,35 +41,17 @@ public sealed class AppointmentsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateAppointmentRequest request)
     {
-        try
-        {
-            var created = await _service.CreateAsync(request);
-            _logger.LogInformation("Created appointment {AppointmentId}", created.Id);
+        var created = await _service.CreateAsync(request);
+        _logger.LogInformation("Created appointment {AppointmentId}", created.Id);
 
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-        }
-        catch (ValidationException exception)
-        {
-            return BadRequest(new { message = exception.Message });
-        }
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] CreateAppointmentRequest request)
     {
-        try
-        {
-            var updated = await _service.UpdateAsync(id, request);
-            return Ok(updated);
-        }
-        catch (ValidationException exception)
-        {
-            return BadRequest(new { message = exception.Message });
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound();
-        }
+        var updated = await _service.UpdateAsync(id, request);
+        return Ok(updated);
     }
 
     [HttpDelete("{id:guid}")]

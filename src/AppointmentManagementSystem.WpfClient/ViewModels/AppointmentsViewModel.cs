@@ -71,6 +71,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                 {
                     Id = Guid.NewGuid(),
                     Title = "New Appointment",
+                    Description = "Created from WPF client",
                     Start = now.AddMinutes(30),
                     End = now.AddMinutes(90)
                 };
@@ -97,6 +98,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                 {
                     Id = SelectedAppointment.Id,
                     Title = SelectedAppointment.Title,
+                    Description = SelectedAppointment.Description,
                     Start = SelectedAppointment.Start,
                     End = SelectedAppointment.End
                 };

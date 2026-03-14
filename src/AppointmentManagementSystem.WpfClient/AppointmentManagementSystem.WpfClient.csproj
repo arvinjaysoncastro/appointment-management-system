@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
@@ -60,10 +61,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="IServiceProvider.cs" />
-    <Compile Include="ServiceCollection.cs" />
-    <Compile Include="ServiceDescriptor.cs" />
-    <Compile Include="ServiceProvider.cs" />
     <Compile Include="DateTimeOffsetToDateTimeConverter.cs" />
     <Compile Include="NotNullToVisibilityConverter.cs" />
     <Compile Include="NullToVisibilityConverter.cs" />
@@ -79,12 +76,6 @@
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
-    <Page Include="Views\AppointmentCreateView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\AppointmentListView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\AppointmentsView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -96,33 +87,17 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="BooleanInvertConverter.cs" />
-    <Compile Include="Helpers\PatientLookup.cs" />
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Infrastructure\ViewModelBase.cs" />
     <Compile Include="InvertBooleanToVisibilityConverter.cs" />
-    <Compile Include="Models\PatientOption.cs" />
     <Compile Include="Models\AppointmentModel.cs" />
     <Compile Include="Models\Person.cs" />
-    <Compile Include="Services\AppointmentDetailsDto.cs" />
     <Compile Include="Services\AppointmentApiService.cs" />
-    <Compile Include="Services\AppointmentApiClient.cs" />
-    <Compile Include="Services\AppointmentSummaryDto.cs" />
-    <Compile Include="Services\CreateAppointmentDto.cs" />
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="StringToVisibilityConverter.cs" />
-    <Compile Include="ViewModels\AppointmentCreatedEventArgs.cs" />
-    <Compile Include="ViewModels\AppointmentCreateViewModel.cs" />
-    <Compile Include="ViewModels\AppointmentItemViewModel.cs" />
-    <Compile Include="ViewModels\AppointmentListViewModel.cs" />
     <Compile Include="ViewModels\AppointmentsViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\PeopleViewModel.cs" />
-    <Compile Include="Views\AppointmentCreateView.xaml.cs">
-      <DependentUpon>AppointmentCreateView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\AppointmentListView.xaml.cs">
-      <DependentUpon>AppointmentListView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\AppointmentsView.xaml.cs">
       <DependentUpon>AppointmentsView.xaml</DependentUpon>
     </Compile>

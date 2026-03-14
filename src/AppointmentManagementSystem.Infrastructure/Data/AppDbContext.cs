@@ -24,6 +24,10 @@ public sealed class AppDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(200);
 
+            entity.Property(a => a.Description)
+                .IsRequired()
+                .HasMaxLength(2000);
+
             entity.Property(a => a.Start)
                 .IsRequired();
 

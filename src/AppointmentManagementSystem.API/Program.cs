@@ -1,4 +1,6 @@
 using AppointmentManagementSystem.Application;
+using AppointmentManagementSystem.Application.Interfaces;
+using AppointmentManagementSystem.Application.Services;
 using AppointmentManagementSystem.API.Configuration;
 using AppointmentManagementSystem.Infrastructure;
 
@@ -8,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddApplication();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
