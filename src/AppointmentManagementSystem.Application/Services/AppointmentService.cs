@@ -2,16 +2,21 @@ using AppointmentManagementSystem.Application.DTOs;
 using AppointmentManagementSystem.Application.Interfaces;
 using AppointmentManagementSystem.Domain.Entities;
 using AppointmentManagementSystem.Domain.Interfaces;
+using AppointmentManagementSystem.Domain.Services;
 
 namespace AppointmentManagementSystem.Application.Services;
 
 public sealed class AppointmentService : IAppointmentService
 {
     private readonly IAppointmentRepository _appointmentRepository;
+    private readonly AppointmentSchedulingService _schedulingService;
 
-    public AppointmentService(IAppointmentRepository appointmentRepository)
+    public AppointmentService(
+        IAppointmentRepository appointmentRepository,
+        AppointmentSchedulingService schedulingService)
     {
         _appointmentRepository = appointmentRepository;
+        _schedulingService = schedulingService;
     }
 
     public async Task<IEnumerable<AppointmentDto>> GetAllAsync()
@@ -33,7 +38,7 @@ public sealed class AppointmentService : IAppointmentService
         var appointment = new Appointment(request.Title, request.Description, request.Start, request.End);
         var existing = await _appointmentRepository.GetAllAsync();
 
-        appointment.EnsureNoOverlap(existing);
+        _schedulingService.EnsureNoOverlap(appointment, existing);
 
         await _appointmentRepository.AddAsync(appointment);
 
@@ -53,7 +58,7 @@ public sealed class AppointmentService : IAppointmentService
         var updatedAppointment = new Appointment(id, request.Title, request.Description, request.Start, request.End);
         var allAppointments = await _appointmentRepository.GetAllAsync();
 
-        updatedAppointment.EnsureNoOverlap(allAppointments);
+        _schedulingService.EnsureNoOverlap(updatedAppointment, allAppointments);
 
         await _appointmentRepository.UpdateAsync(updatedAppointment);
 

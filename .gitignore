@@ -8,6 +8,7 @@
 # Build folders
 bin/
 obj/
+artifacts/
 
 # VS Code
 .vscode/

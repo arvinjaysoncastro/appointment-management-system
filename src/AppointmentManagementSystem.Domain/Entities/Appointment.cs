@@ -49,23 +49,5 @@ public sealed class Appointment
         Start = start;
         End = end;
     }
-
-    public void EnsureNoOverlap(IEnumerable<Appointment> existing)
-    {
-        ArgumentNullException.ThrowIfNull(existing);
-
-        foreach (var appointment in existing)
-        {
-            if (appointment.Id == Id)
-            {
-                continue;
-            }
-
-            if (Start < appointment.End && End > appointment.Start)
-            {
-                throw new DomainException("Appointment overlaps with an existing appointment.");
-            }
-        }
-    }
 }
 

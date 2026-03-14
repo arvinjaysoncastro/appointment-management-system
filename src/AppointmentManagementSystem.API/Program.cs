@@ -2,6 +2,7 @@ using AppointmentManagementSystem.Application;
 using AppointmentManagementSystem.Application.Interfaces;
 using AppointmentManagementSystem.Application.Services;
 using AppointmentManagementSystem.API.Configuration;
+using AppointmentManagementSystem.Domain.Services;
 using AppointmentManagementSystem.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddApplication();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<AppointmentSchedulingService>();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
