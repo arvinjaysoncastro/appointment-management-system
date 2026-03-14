@@ -43,6 +43,12 @@ namespace AppointmentManagementSystem.WpfClient.Services
                 throw new InvalidOperationException($"No view mapping registered for '{viewModelType.Name}'.");
 
             _currentViewModel = _serviceProvider.GetRequiredService<TViewModel>();
+
+            if (_currentViewModel is IAsyncInitializable initializable)
+            {
+                _ = initializable.InitializeAsync();
+            }
+
             CurrentViewModelChanged?.Invoke(this, EventArgs.Empty);
         }
     }

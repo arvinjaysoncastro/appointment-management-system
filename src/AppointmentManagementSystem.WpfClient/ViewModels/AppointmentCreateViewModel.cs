@@ -192,12 +192,4 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             AppointmentCreated?.Invoke(this, args);
         }
     }
-
-    /// <summary>
-    /// Event args for appointment created event.
-    /// </summary>
-    public class AppointmentCreatedEventArgs : EventArgs
-    {
-        public Guid AppointmentId { get; set; }
-    }
 }

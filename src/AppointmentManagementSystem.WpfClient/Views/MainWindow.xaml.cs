@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using AppointmentManagementSystem.WpfClient.ViewModels;
-using AppointmentManagementSystem.WpfClient.Views;
 
 namespace AppointmentManagementSystem.WpfClient
 {
@@ -37,11 +36,6 @@ namespace AppointmentManagementSystem.WpfClient
         private void Close_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

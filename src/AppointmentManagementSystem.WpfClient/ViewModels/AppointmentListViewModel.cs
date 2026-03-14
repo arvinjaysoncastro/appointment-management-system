@@ -5,7 +5,6 @@ using System.Windows.Input;
 using AppointmentManagementSystem.WpfClient.Helpers;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
 using AppointmentManagementSystem.WpfClient.Services;
-using AppointmentManagementSystem.WpfClient.Views;
 
 namespace AppointmentManagementSystem.WpfClient.ViewModels
 {
@@ -14,7 +13,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
     /// Receives AppointmentApiClient via constructor injection.
     /// No business logic - only orchestrates service calls and updates UI state.
     /// </summary>
-    public class AppointmentListViewModel : ViewModelBase
+    public class AppointmentListViewModel : ViewModelBase, IAsyncInitializable
     {
         private readonly IAppointmentApiClient _appointmentApiClient;
         private readonly AppointmentCreateViewModel _createViewModel;
@@ -82,7 +81,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             _appointmentApiClient = appointmentApiClient ?? throw new ArgumentNullException(nameof(appointmentApiClient));
             _createViewModel = createViewModel ?? throw new ArgumentNullException(nameof(createViewModel));
             Appointments = new ObservableCollection<AppointmentItemViewModel>();
-            SelectedDate = DateTime.Today;
+            _selectedDate = DateTime.Today;
             LoadAppointmentsCommand = new AsyncRelayCommand(LoadAppointmentsAsync);
             AddAppointmentCommand = new RelayCommand(_ => OpenCreateDrawer());
             OpenCreateDrawerCommand = new RelayCommand(_ => OpenCreateDrawer());
@@ -93,9 +92,11 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             // Keep list and drawer state in sync with create form lifecycle.
             _createViewModel.AppointmentCreated += OnAppointmentCreated;
             _createViewModel.Cancelled += OnCreateCancelled;
+        }
 
-            // Auto-load appointments for today on initialization
-            _ = LoadAppointmentsAsync();
+        public System.Threading.Tasks.Task InitializeAsync()
+        {
+            return LoadAppointmentsAsync();
         }
 
         private async void OnAppointmentCreated(object sender, AppointmentCreatedEventArgs e)
@@ -191,55 +192,6 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private void DeleteAppointment(AppointmentItemViewModel appointment)
         {
             Appointments.Remove(appointment);
-        }
-    }
-
-    /// <summary>
-    /// ViewModel for a single appointment item in the list.
-    /// </summary>
-    public class AppointmentItemViewModel : ViewModelBase
-    {
-        private Guid _id;
-        private Guid _patientId;
-        private string _patientName;
-        private DateTimeOffset _startTime;
-        private DateTimeOffset _endTime;
-        private string _title;
-
-        public Guid Id
-        {
-            get => _id;
-            set => SetProperty(ref _id, value);
-        }
-
-        public Guid PatientId
-        {
-            get => _patientId;
-            set => SetProperty(ref _patientId, value);
-        }
-
-        public string PatientName
-        {
-            get => _patientName;
-            set => SetProperty(ref _patientName, value);
-        }
-
-        public DateTimeOffset StartTime
-        {
-            get => _startTime;
-            set => SetProperty(ref _startTime, value);
-        }
-
-        public DateTimeOffset EndTime
-        {
-            get => _endTime;
-            set => SetProperty(ref _endTime, value);
-        }
-
-        public string Title
-        {
-            get => _title;
-            set => SetProperty(ref _title, value);
         }
     }
 }

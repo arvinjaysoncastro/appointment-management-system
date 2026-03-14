@@ -48,7 +48,7 @@
                 <Button 
                     Command="{Binding ShowAppointmentsCommand}"
                     Content="Appointments" 
-                    Style="{StaticResource SidebarButtonStyle}" Click="Button_Click"/>
+                    Style="{StaticResource SidebarButtonStyle}"/>
                 
                 <Button 
                     Command="{Binding ShowSettingsCommand}"
