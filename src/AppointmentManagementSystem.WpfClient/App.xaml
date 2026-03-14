@@ -147,7 +147,7 @@
         </Style>
 
         <!-- ViewModel-to-View mappings for MVVM navigation -->
-        <DataTemplate DataType="{x:Type viewModels:AppointmentListViewModel}">
+        <DataTemplate DataType="{x:Type viewModels:AppointmentsViewModel}">
             <views:AppointmentsView/>
         </DataTemplate>
 

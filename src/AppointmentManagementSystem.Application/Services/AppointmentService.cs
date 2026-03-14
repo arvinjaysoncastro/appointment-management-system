@@ -1,135 +1,76 @@
 using AppointmentManagementSystem.Application.DTOs;
-using AppointmentManagementSystem.Application.Errors;
-using AppointmentManagementSystem.Application.Exceptions;
-using AppointmentManagementSystem.Application.Repositories;
-using AppointmentManagementSystem.Domain.Entities;
+using AppointmentManagementSystem.Application.Interfaces;
+using AutoMapper;
+using FluentValidation;
+using Appointment = AppointmentManagementSystem.Domain.Entities.Appointment;
+using IAppointmentRepository = AppointmentManagementSystem.Domain.Interfaces.IAppointmentRepository;
 
 namespace AppointmentManagementSystem.Application.Services;
 
 public sealed class AppointmentService : IAppointmentService
 {
     private readonly IAppointmentRepository _appointmentRepository;
-    private readonly IPatientRepository _patientRepository;
+    private readonly IMapper _mapper;
+    private readonly IValidator<CreateAppointmentRequest> _createAppointmentValidator;
 
     public AppointmentService(
         IAppointmentRepository appointmentRepository,
-        IPatientRepository patientRepository)
+        IMapper mapper,
+        IValidator<CreateAppointmentRequest> createAppointmentValidator)
     {
         _appointmentRepository = appointmentRepository;
-        _patientRepository = patientRepository;
+        _mapper = mapper;
+        _createAppointmentValidator = createAppointmentValidator;
     }
 
-    public async Task<AppointmentDetailsDto> CreateAsync(
-        CreateAppointmentRequest request,
-        CancellationToken cancellationToken)
+    public async Task<IEnumerable<AppointmentDto>> GetAllAsync()
     {
-        if (request.EndTime <= request.StartTime)
-            throw new BusinessException(ErrorCodes.ValidationError, "End time must be after start time.");
-
-        var patient = await _patientRepository.GetByIdAsync(request.PatientId, cancellationToken);
-        if (patient is null)
-        {
-            throw new BusinessException(ErrorCodes.PatientNotFound, "Patient not found.");
-        }
-
-        var existing = await _appointmentRepository.SearchAsync(request.StartTime, cancellationToken);
-
-        // prevent overlapping appointments for the same time slot
-        if (existing.Any(e => request.StartTime < e.EndTime && request.EndTime > e.StartTime))
-        {
-            throw new BusinessException(
-                ErrorCodes.AppointmentOverlap,
-                "Appointment overlaps with an existing appointment.");
-        }
-
-        var appointment = new Appointment(
-            Guid.NewGuid(),
-            request.PatientId,
-            request.Title,
-            request.StartTime,
-            request.EndTime,
-            request.Notes);
-
-        await _appointmentRepository.AddAsync(appointment, cancellationToken);
-
-        return new AppointmentDetailsDto
-        {
-            Id = appointment.Id,
-            PatientId = appointment.PatientId,
-            PatientName = patient.FirstName + " " + patient.LastName,
-            Title = appointment.Title,
-            Notes = appointment.Notes,
-            StartTime = appointment.StartTime,
-            EndTime = appointment.EndTime,
-            CreatedAt = appointment.CreatedAt
-        };
+        var appointments = await _appointmentRepository.GetAllAsync();
+        return _mapper.Map<IEnumerable<AppointmentDto>>(appointments);
     }
 
-    public async Task<AppointmentDetailsDto?> GetAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<AppointmentDto?> GetByIdAsync(Guid id)
     {
-        var appointment = await _appointmentRepository.GetByIdAsync(id, cancellationToken);
-        if (appointment is null)
-        {
-            return null;
-        }
-
-        var patient = await _patientRepository.GetByIdAsync(appointment.PatientId, cancellationToken);
-
-        return new AppointmentDetailsDto
-        {
-            Id = appointment.Id,
-            PatientId = appointment.PatientId,
-            PatientName = patient is null ? string.Empty : patient.FirstName + " " + patient.LastName,
-            Title = appointment.Title,
-            Notes = appointment.Notes,
-            StartTime = appointment.StartTime,
-            EndTime = appointment.EndTime,
-            CreatedAt = appointment.CreatedAt
-        };
+        var appointment = await _appointmentRepository.GetByIdAsync(id);
+        return appointment is null ? null : _mapper.Map<AppointmentDto>(appointment);
     }
 
-    public async Task<IReadOnlyList<AppointmentSummaryDto>> SearchAsync(DateTime date, CancellationToken cancellationToken)
+    public async Task<AppointmentDto> CreateAsync(CreateAppointmentRequest request)
     {
-        var targetDate = new DateTimeOffset(date.Date, TimeSpan.Zero);
-        return await _appointmentRepository.SearchAsync(targetDate, cancellationToken);
+        await _createAppointmentValidator.ValidateAndThrowAsync(request);
+
+        var appointment = _mapper.Map<Appointment>(request);
+        var existing = await _appointmentRepository.GetAllAsync();
+
+        appointment.EnsureNoOverlap(existing);
+
+        await _appointmentRepository.AddAsync(appointment);
+
+        return _mapper.Map<AppointmentDto>(appointment);
     }
 
-    public async Task UpdateAsync(Guid id, UpdateAppointmentRequest request, CancellationToken cancellationToken)
+    public async Task<AppointmentDto> UpdateAsync(Guid id, CreateAppointmentRequest request)
     {
-        if (request.EndTime <= request.StartTime)
-            throw new BusinessException(ErrorCodes.ValidationError, "End time must be after start time.");
+        await _createAppointmentValidator.ValidateAndThrowAsync(request);
 
-        var appointment = await _appointmentRepository.GetByIdAsync(id, cancellationToken);
-        if (appointment is null)
+        var existingAppointment = await _appointmentRepository.GetByIdAsync(id);
+        if (existingAppointment is null)
         {
-            throw new BusinessException(ErrorCodes.AppointmentNotFound, "Appointment not found.");
+            throw new KeyNotFoundException($"Appointment '{id}' was not found.");
         }
 
-        var existing = await _appointmentRepository.SearchAsync(request.StartTime, cancellationToken);
+        var updatedAppointment = new Appointment(id, request.Title, request.Start, request.End);
+        var allAppointments = await _appointmentRepository.GetAllAsync();
 
-        // prevent overlapping appointments excluding the current one
-        if (existing.Any(e => e.Id != id && request.StartTime < e.EndTime && request.EndTime > e.StartTime))
-        {
-            throw new BusinessException(
-                ErrorCodes.AppointmentOverlap,
-                "Appointment overlaps with an existing appointment.");
-        }
+        updatedAppointment.EnsureNoOverlap(allAppointments);
 
-        appointment.SetTitle(request.Title);
-        appointment.SetNotes(request.Notes);
-        appointment.SetTimeRange(request.StartTime, request.EndTime);
+        await _appointmentRepository.UpdateAsync(updatedAppointment);
 
-        await _appointmentRepository.UpdateAsync(appointment, cancellationToken);
+        return _mapper.Map<AppointmentDto>(updatedAppointment);
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    public async Task DeleteAsync(Guid id)
     {
-        var appointment = await _appointmentRepository.GetByIdAsync(id, cancellationToken);
-        if (appointment is null)
-        {
-            throw new BusinessException(ErrorCodes.AppointmentNotFound, "Appointment not found.");
-        }
-
-        await _appointmentRepository.DeleteAsync(appointment, cancellationToken);
+        await _appointmentRepository.DeleteAsync(id);
     }
 }

@@ -1,6 +1,6 @@
 using System.Text.Json;
-using AppointmentManagementSystem.Application.Errors;
-using AppointmentManagementSystem.Application.Exceptions;
+using AppointmentManagementSystem.Domain.Exceptions;
+using FluentValidation;
 
 namespace AppointmentManagementSystem.API.Configuration;
 
@@ -31,10 +31,20 @@ public sealed class ExceptionHandlingMiddleware
 
         var response = exception switch
         {
-            BusinessException businessException => new
+            ValidationException validationException => new
             {
-                errorCode = businessException.ErrorCode,
-                message = businessException.Message
+                errorCode = "ValidationError",
+                message = validationException.Message
+            },
+            DomainException domainException => new
+            {
+                errorCode = "DomainError",
+                message = domainException.Message
+            },
+            KeyNotFoundException notFoundException => new
+            {
+                errorCode = "NotFound",
+                message = notFoundException.Message
             },
             _ => new
             {
@@ -45,9 +55,9 @@ public sealed class ExceptionHandlingMiddleware
 
         context.Response.StatusCode = exception switch
         {
-            BusinessException businessException when businessException.ErrorCode == ErrorCodes.AppointmentNotFound
-                => StatusCodes.Status404NotFound,
-            BusinessException => StatusCodes.Status400BadRequest,
+            KeyNotFoundException => StatusCodes.Status404NotFound,
+            ValidationException => StatusCodes.Status400BadRequest,
+            DomainException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
 

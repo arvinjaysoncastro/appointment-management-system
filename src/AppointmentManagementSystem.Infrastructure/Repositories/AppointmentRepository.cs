@@ -1,69 +1,54 @@
-using AppointmentManagementSystem.Application.DTOs;
-using AppointmentManagementSystem.Application.Repositories;
 using AppointmentManagementSystem.Domain.Entities;
-using AppointmentManagementSystem.Infrastructure.Persistence;
+using AppointmentManagementSystem.Domain.Interfaces;
+using AppointmentManagementSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace AppointmentManagementSystem.Infrastructure.Repositories;
 
 public sealed class AppointmentRepository : IAppointmentRepository
 {
-    private readonly AppDbContext _dbContext;
+    private readonly AppDbContext _context;
 
-    public AppointmentRepository(AppDbContext dbContext)
+    public AppointmentRepository(AppDbContext context)
     {
-        _dbContext = dbContext;
+        _context = context;
     }
 
-    public async Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Appointment>> GetAllAsync()
     {
-        return await _dbContext.Appointments.FindAsync(new object[] { id }, cancellationToken);
-    }
-
-    public async Task<IReadOnlyList<AppointmentSummaryDto>> SearchAsync(
-        DateTimeOffset date,
-        CancellationToken cancellationToken)
-    {
-        var start = new DateTimeOffset(date.DateTime.Date, date.Offset);
-        var end = start.AddDays(1);
-
-        var appointments = await _dbContext.Appointments
+        return await _context.Appointments
             .AsNoTracking()
-            //.Include(a => a.Patient)
-            .ToListAsync(cancellationToken);
-
-        return appointments
-            .Where(a => a.StartTime >= start && a.StartTime < end)
-            .Select(a => new AppointmentSummaryDto
-            {
-                Id = a.Id,
-                PatientId = a.PatientId,
-                //PatientName = a.Patient != null
-                //    ? a.Patient.FirstName + " " + a.Patient.LastName
-                //    : string.Empty,
-                Title = a.Title,
-                StartTime = a.StartTime,
-                EndTime = a.EndTime
-            })
-            .OrderBy(a => a.StartTime)
-            .ToList();
+            .ToListAsync();
     }
 
-    public async Task AddAsync(Appointment appointment, CancellationToken cancellationToken)
+    public async Task<Appointment?> GetByIdAsync(Guid id)
     {
-        await _dbContext.Appointments.AddAsync(appointment, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        return await _context.Appointments
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken)
+    public async Task AddAsync(Appointment appointment)
     {
-        _dbContext.Appointments.Update(appointment);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _context.Appointments.AddAsync(appointment);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Appointment appointment, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Appointment appointment)
     {
-        _dbContext.Appointments.Remove(appointment);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        _context.Appointments.Update(appointment);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        var appointment = await _context.Appointments.FindAsync(id);
+        if (appointment is null)
+        {
+            return;
+        }
+
+        _context.Appointments.Remove(appointment);
+        await _context.SaveChangesAsync();
     }
 }

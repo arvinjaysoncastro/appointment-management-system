@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Windows;
 using AppointmentManagementSystem.WpfClient.Services;
@@ -24,14 +25,24 @@ namespace AppointmentManagementSystem.WpfClient
 
         private void ConfigureServices(ServiceCollection services)
         {
-            // Register HttpClient as singleton with proper HTTPS handling for development
+            // Register HttpClient as singleton with proper HTTPS handling for development.
+            // This is equivalent to AddHttpClient in the custom DI container.
             var httpHandler = new HttpClientHandler();
             #if DEBUG
             // Allow self-signed certificates in development only
             httpHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
             #endif
-            var configuredHttpClient = new HttpClient(httpHandler);
+            var configuredHttpClient = new HttpClient(httpHandler)
+            {
+                BaseAddress = new Uri("https://localhost:7017")
+            };
             services.AddSingleton(configuredHttpClient);
+
+            services.AddTransient<AppointmentApiService>(provider =>
+            {
+                var httpClient = provider.GetRequiredService<HttpClient>();
+                return new AppointmentApiService(httpClient);
+            });
 
             // Register AppointmentApiClient (transient - new instance each time)
             services.AddTransient<IAppointmentApiClient>(provider =>
@@ -49,6 +60,12 @@ namespace AppointmentManagementSystem.WpfClient
 
             services.AddTransient<PeopleViewModel>(provider => new PeopleViewModel());
             services.AddTransient<SettingsViewModel>(provider => new SettingsViewModel());
+
+            services.AddTransient<AppointmentsViewModel>(provider =>
+            {
+                var apiService = provider.GetRequiredService<AppointmentApiService>();
+                return new AppointmentsViewModel(apiService);
+            });
 
             // Register AppointmentListViewModel (transient - new instance each time)
             services.AddTransient<AppointmentListViewModel>(provider =>
@@ -88,7 +105,7 @@ namespace AppointmentManagementSystem.WpfClient
             base.OnStartup(e);
 
             var navigationService = _serviceProvider.GetRequiredService<INavigationService>();
-            navigationService.Register<AppointmentListViewModel, AppointmentsView>();
+            navigationService.Register<AppointmentsViewModel, AppointmentsView>();
             navigationService.Register<PeopleViewModel, PeopleView>();
             navigationService.Register<SettingsViewModel, SettingsView>();
             

@@ -51,6 +51,8 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
   <ItemGroup>
@@ -99,8 +101,10 @@
     <Compile Include="Infrastructure\ViewModelBase.cs" />
     <Compile Include="InvertBooleanToVisibilityConverter.cs" />
     <Compile Include="Models\PatientOption.cs" />
+    <Compile Include="Models\AppointmentModel.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Services\AppointmentDetailsDto.cs" />
+    <Compile Include="Services\AppointmentApiService.cs" />
     <Compile Include="Services\AppointmentApiClient.cs" />
     <Compile Include="Services\AppointmentSummaryDto.cs" />
     <Compile Include="Services\CreateAppointmentDto.cs" />
@@ -110,6 +114,7 @@
     <Compile Include="ViewModels\AppointmentCreateViewModel.cs" />
     <Compile Include="ViewModels\AppointmentItemViewModel.cs" />
     <Compile Include="ViewModels\AppointmentListViewModel.cs" />
+    <Compile Include="ViewModels\AppointmentsViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\PeopleViewModel.cs" />
     <Compile Include="Views\AppointmentCreateView.xaml.cs">
@@ -157,6 +162,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Commands\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\noise.png" />

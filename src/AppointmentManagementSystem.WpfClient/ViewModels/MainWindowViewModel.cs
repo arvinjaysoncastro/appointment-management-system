@@ -45,7 +45,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
 
         private void ShowAppointments()
         {
-            _navigationService.NavigateTo<AppointmentListViewModel>();
+            _navigationService.NavigateTo<AppointmentsViewModel>();
         }
 
         private void ShowPeople()
