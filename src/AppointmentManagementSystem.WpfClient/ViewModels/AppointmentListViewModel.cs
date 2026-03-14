@@ -90,8 +90,23 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             EditAppointmentCommand = new RelayCommand<AppointmentItemViewModel>(EditAppointment);
             DeleteAppointmentCommand = new RelayCommand<AppointmentItemViewModel>(DeleteAppointment);
 
+            // Keep list and drawer state in sync with create form lifecycle.
+            _createViewModel.AppointmentCreated += OnAppointmentCreated;
+            _createViewModel.Cancelled += OnCreateCancelled;
+
             // Auto-load appointments for today on initialization
             _ = LoadAppointmentsAsync();
+        }
+
+        private async void OnAppointmentCreated(object sender, AppointmentCreatedEventArgs e)
+        {
+            CloseDrawer();
+            await LoadAppointmentsAsync();
+        }
+
+        private void OnCreateCancelled(object sender, EventArgs e)
+        {
+            CloseDrawer();
         }
 
         private async System.Threading.Tasks.Task LoadAppointmentsAsync()

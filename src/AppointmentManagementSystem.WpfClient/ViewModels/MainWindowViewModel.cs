@@ -1,54 +1,34 @@
 using System;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
-using AppointmentManagementSystem.WpfClient.Views;
+using AppointmentManagementSystem.WpfClient.Services;
 
 namespace AppointmentManagementSystem.WpfClient.ViewModels
 {
     /// <summary>
     /// ViewModel for the main application window.
-    /// Manages navigation between different views (Appointments, People, Settings).
-    /// Uses command pattern to switch between views.
+    /// Manages navigation between sections via INavigationService.
+    /// Views are resolved by DataTemplates, keeping view concerns out of the ViewModel.
     /// </summary>
     public class MainWindowViewModel : ViewModelBase
     {
-        private readonly AppointmentListViewModel _appointmentListViewModel;
-        private readonly PeopleViewModel _peopleViewModel;
-        private readonly SettingsViewModel _settingsViewModel;
-        private readonly AppointmentsView _appointmentsView;
-        private readonly PeopleView _peopleView;
-        private readonly SettingsView _settingsView;
-        private object _currentView;
+        private readonly INavigationService _navigationService;
+        private object _currentViewModel;
 
-        public object CurrentView
+        public object CurrentViewModel
         {
-            get => _currentView;
-            set => SetProperty(ref _currentView, value);
+            get => _currentViewModel;
+            set => SetProperty(ref _currentViewModel, value);
         }
 
         public ICommand ShowAppointmentsCommand { get; }
         public ICommand ShowPeopleCommand { get; }
         public ICommand ShowSettingsCommand { get; }
 
-        public MainWindowViewModel(AppointmentListViewModel appointmentListViewModel)
+        public MainWindowViewModel(INavigationService navigationService)
         {
-            _appointmentListViewModel = appointmentListViewModel ?? throw new ArgumentNullException(nameof(appointmentListViewModel));
-            _peopleViewModel = new PeopleViewModel();
-            _settingsViewModel = new SettingsViewModel();
-
-            // Create AppointmentsView with ViewModel binding
-            _appointmentsView = new AppointmentsView();
-            _appointmentsView.DataContext = _appointmentListViewModel;
-
-            // Create PeopleView with ViewModel binding
-            _peopleView = new PeopleView();
-            _peopleView.DataContext = _peopleViewModel;
-
-            // Create SettingsView with ViewModel binding
-            _settingsView = new SettingsView();
-            _settingsView.DataContext = _settingsViewModel;
+            _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
+            _navigationService.CurrentViewModelChanged += OnCurrentViewModelChanged;
 
             ShowAppointmentsCommand = new RelayCommand(_ => ShowAppointments());
             ShowPeopleCommand = new RelayCommand(_ => ShowPeople());
@@ -58,19 +38,24 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             ShowAppointments();
         }
 
+        private void OnCurrentViewModelChanged(object sender, EventArgs e)
+        {
+            CurrentViewModel = _navigationService.CurrentViewModel;
+        }
+
         private void ShowAppointments()
         {
-            CurrentView = _appointmentsView;
+            _navigationService.NavigateTo<AppointmentListViewModel>();
         }
 
         private void ShowPeople()
         {
-            CurrentView = _peopleView;
+            _navigationService.NavigateTo<PeopleViewModel>();
         }
 
         private void ShowSettings()
         {
-            CurrentView = _settingsView;
+            _navigationService.NavigateTo<SettingsViewModel>();
         }
     }
 }

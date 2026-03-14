@@ -153,6 +153,9 @@ namespace AppointmentManagementSystem.WpfClient
                 return new AppointmentCreateViewModel(apiClient);
             });
 
+            services.AddTransient<PeopleViewModel>(provider => new PeopleViewModel());
+            services.AddTransient<SettingsViewModel>(provider => new SettingsViewModel());
+
             // Register AppointmentListViewModel (transient - new instance each time)
             services.AddTransient<AppointmentListViewModel>(provider =>
             {
@@ -161,11 +164,21 @@ namespace AppointmentManagementSystem.WpfClient
                 return new AppointmentListViewModel(apiClient, createViewModel);
             });
 
+            // Register views for IoC completeness. Rendering is done via App.xaml DataTemplates.
+            services.AddTransient<AppointmentsView>(provider => new AppointmentsView());
+            services.AddTransient<PeopleView>(provider => new PeopleView());
+            services.AddTransient<SettingsView>(provider => new SettingsView());
+
+            services.AddSingleton<INavigationService>(provider =>
+            {
+                return new NavigationService(provider);
+            });
+
             // Register MainWindowViewModel (singleton - created once via DI)
             services.AddSingleton<MainWindowViewModel>(provider =>
             {
-                var appointmentListViewModel = provider.GetRequiredService<AppointmentListViewModel>();
-                return new MainWindowViewModel(appointmentListViewModel);
+                var navigationService = provider.GetRequiredService<INavigationService>();
+                return new MainWindowViewModel(navigationService);
             });
 
             // Register MainWindow as singleton (created once via DI)
@@ -179,6 +192,11 @@ namespace AppointmentManagementSystem.WpfClient
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            var navigationService = _serviceProvider.GetRequiredService<INavigationService>();
+            navigationService.Register<AppointmentListViewModel, AppointmentsView>();
+            navigationService.Register<PeopleViewModel, PeopleView>();
+            navigationService.Register<SettingsViewModel, SettingsView>();
             
             // Resolve and show MainWindow via DI container
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();

@@ -366,7 +366,7 @@
 					<!-- Buttons -->
 					<StackPanel Orientation="Horizontal" Margin="0,20,0,0">
 						<Button Content="Save"
-                                Command="{Binding CreateViewModel.SaveAppointmentCommand}"
+                                Command="{Binding CreateViewModel.CreateCommand}"
                                 Padding="12,8"
                                 Background="#4F7DF3"
                                 Foreground="White"

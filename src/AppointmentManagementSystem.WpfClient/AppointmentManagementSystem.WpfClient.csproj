@@ -51,6 +51,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+  <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -90,6 +93,7 @@
     <Compile Include="Models\PatientOption.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Services\AppointmentApiClient.cs" />
+    <Compile Include="Services\NavigationService.cs" />
     <Compile Include="StringToVisibilityConverter.cs" />
     <Compile Include="ViewModels\AppointmentCreateViewModel.cs" />
     <Compile Include="ViewModels\AppointmentListViewModel.cs" />

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AppointmentManagementSystem.Application.Errors;
 using AppointmentManagementSystem.Application.Exceptions;
 
 namespace AppointmentManagementSystem.API.Configuration;
@@ -44,6 +45,8 @@ public sealed class ExceptionHandlingMiddleware
 
         context.Response.StatusCode = exception switch
         {
+            BusinessException businessException when businessException.ErrorCode == ErrorCodes.AppointmentNotFound
+                => StatusCodes.Status404NotFound,
             BusinessException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };

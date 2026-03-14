@@ -51,11 +51,6 @@
                     Style="{StaticResource SidebarButtonStyle}" Click="Button_Click"/>
                 
                 <Button 
-                    Command="{Binding ShowPeopleCommand}"
-                    Content="People" 
-                    Style="{StaticResource SidebarButtonStyle}"/>
-                
-                <Button 
                     Command="{Binding ShowSettingsCommand}"
                     Content="Settings" 
                     Style="{StaticResource SidebarButtonStyle}"/>
@@ -83,7 +78,7 @@
         <Border Grid.Column="1"
                 Background="#F5F6FA"
                 Padding="20">
-            <ContentControl Content="{Binding CurrentView}"/>
+            <ContentControl Content="{Binding CurrentViewModel}"/>
         </Border>
     </Grid>
 </Window>

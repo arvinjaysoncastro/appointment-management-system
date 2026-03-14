@@ -20,7 +20,7 @@ public sealed class AppointmentController : ControllerBase
         [FromQuery] DateTime? date,
         CancellationToken cancellationToken)
     {
-        var searchDate = date ?? DateTime.Now.Date;
+        var searchDate = date ?? DateTime.UtcNow.Date;
         var appointments = await _appointmentService.SearchAsync(searchDate, cancellationToken);
         return Ok(appointments);
     }
@@ -44,6 +44,11 @@ public sealed class AppointmentController : ControllerBase
         [FromBody] CreateAppointmentRequest request,
         CancellationToken cancellationToken)
     {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
         var appointment = await _appointmentService.CreateAsync(request, cancellationToken);
         return CreatedAtAction(nameof(Get), new { id = appointment.Id }, appointment);
     }
@@ -54,6 +59,17 @@ public sealed class AppointmentController : ControllerBase
         [FromBody] UpdateAppointmentRequest request,
         CancellationToken cancellationToken)
     {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        var appointment = await _appointmentService.GetAsync(id, cancellationToken);
+        if (appointment is null)
+        {
+            return NotFound();
+        }
+
         await _appointmentService.UpdateAsync(id, request, cancellationToken);
         return NoContent();
     }
@@ -63,6 +79,12 @@ public sealed class AppointmentController : ControllerBase
         Guid id,
         CancellationToken cancellationToken)
     {
+        var appointment = await _appointmentService.GetAsync(id, cancellationToken);
+        if (appointment is null)
+        {
+            return NotFound();
+        }
+
         await _appointmentService.DeleteAsync(id, cancellationToken);
         return NoContent();
     }
