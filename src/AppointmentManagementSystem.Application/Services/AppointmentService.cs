@@ -3,16 +3,21 @@ using AppointmentManagementSystem.Application.Interfaces;
 using AppointmentManagementSystem.Domain.Entities;
 using AppointmentManagementSystem.Domain.Exceptions;
 using AppointmentManagementSystem.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace AppointmentManagementSystem.Application.Services;
 
 public sealed class AppointmentService : IAppointmentService
 {
     private readonly IAppointmentRepository _appointmentRepository;
+    private readonly ILogger<AppointmentService> _logger;
 
-    public AppointmentService(IAppointmentRepository appointmentRepository)
+    public AppointmentService(
+        IAppointmentRepository appointmentRepository,
+        ILogger<AppointmentService> logger)
     {
         _appointmentRepository = appointmentRepository;
+        _logger = logger;
     }
 
     public async Task<List<AppointmentDto>> GetAppointmentsAsync(CancellationToken cancellationToken)
@@ -31,10 +36,21 @@ public sealed class AppointmentService : IAppointmentService
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        _logger.LogInformation(
+            "Creating appointment {Title} from {Start} to {End}.",
+            request.Title,
+            request.Start,
+            request.End);
+
         var appointment = new Appointment(request.Title, request.Description, request.Start, request.End);
 
         if (await HasOverlappingAppointment(request.Start, request.End, cancellationToken))
         {
+            _logger.LogWarning(
+                "Overlap validation failed while creating appointment {Title} from {Start} to {End}.",
+                request.Title,
+                request.Start,
+                request.End);
             throw new DomainException("Appointment overlaps with an existing appointment.");
         }
 
@@ -47,9 +63,17 @@ public sealed class AppointmentService : IAppointmentService
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        _logger.LogInformation(
+            "Updating appointment {AppointmentId} to {Title} from {Start} to {End}.",
+            id,
+            request.Title,
+            request.Start,
+            request.End);
+
         var existingAppointment = await _appointmentRepository.GetByIdAsync(id, cancellationToken);
         if (existingAppointment is null)
         {
+            _logger.LogWarning("Appointment {AppointmentId} was not found for update.", id);
             throw new KeyNotFoundException($"Appointment '{id}' was not found.");
         }
 
@@ -63,6 +87,11 @@ public sealed class AppointmentService : IAppointmentService
 
         if (hasOverlap)
         {
+            _logger.LogWarning(
+                "Overlap validation failed while updating appointment {AppointmentId} to {Start} - {End}.",
+                id,
+                request.Start,
+                request.End);
             throw new DomainException("Appointment overlaps with an existing appointment.");
         }
 
@@ -73,6 +102,15 @@ public sealed class AppointmentService : IAppointmentService
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Deleting appointment {AppointmentId}.", id);
+
+        var existingAppointment = await _appointmentRepository.GetByIdAsync(id, cancellationToken);
+        if (existingAppointment is null)
+        {
+            _logger.LogWarning("Appointment {AppointmentId} was not found for deletion.", id);
+            throw new KeyNotFoundException($"Appointment '{id}' was not found.");
+        }
+
         await _appointmentRepository.DeleteAsync(id, cancellationToken);
     }
 
