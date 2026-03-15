@@ -31,39 +31,44 @@ public sealed class AppointmentRepository : IAppointmentRepository
         _logger.LogDebug("Loading appointment {AppointmentId}.", id);
 
         return await _context.Appointments
-            .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
-    public async Task<bool> HasOverlapAsync(DateTime start, DateTime end, CancellationToken cancellationToken)
+    public async Task<bool> ExistsOverlapAsync(DateTimeOffset start, DateTimeOffset end, Guid? excludeId, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Checking appointment overlap for {Start} to {End}.", start, end);
+        _logger.LogDebug(
+            "Checking appointment overlap for {Start} to {End} excluding {ExcludedAppointmentId}.",
+            start,
+            end,
+            excludeId);
 
         return await _context.Appointments
             .AsNoTracking()
-            .AnyAsync(appointment => appointment.Start < end && appointment.End > start, cancellationToken);
+            .AnyAsync(
+                appointment => appointment.Id != excludeId &&
+                               start < appointment.TimeRange.End &&
+                               end > appointment.TimeRange.Start,
+                cancellationToken);
     }
 
     public async Task AddAsync(Appointment appointment, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Creating appointment {AppointmentId}.", appointment.Id);
-
         await _context.Appointments.AddAsync(appointment, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Updating appointment {AppointmentId}.", appointment.Id);
+        if (_context.Entry(appointment).State == EntityState.Detached)
+        {
+            _context.Appointments.Update(appointment);
+        }
 
-        _context.Appointments.Update(appointment);
         await _context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Deleting appointment {AppointmentId}.", id);
-
         var appointment = await _context.Appointments.FindAsync(new object[] { id }, cancellationToken);
         if (appointment is null)
         {

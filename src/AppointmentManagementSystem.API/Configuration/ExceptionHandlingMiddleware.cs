@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AppointmentManagementSystem.Domain.Errors;
 using AppointmentManagementSystem.Domain.Exceptions;
 
 namespace AppointmentManagementSystem.API.Configuration;
@@ -37,13 +38,8 @@ public sealed class ExceptionHandlingMiddleware
             },
             DomainException domainException => new
             {
-                errorCode = "DomainError",
+                errorCode = domainException.Message,
                 message = domainException.Message
-            },
-            KeyNotFoundException notFoundException => new
-            {
-                errorCode = "NotFound",
-                message = notFoundException.Message
             },
             _ => new
             {
@@ -54,8 +50,8 @@ public sealed class ExceptionHandlingMiddleware
 
         context.Response.StatusCode = exception switch
         {
-            KeyNotFoundException => StatusCodes.Status404NotFound,
             ArgumentException => StatusCodes.Status400BadRequest,
+            DomainException domainException when domainException.Message == DomainErrors.AppointmentNotFound => StatusCodes.Status404NotFound,
             DomainException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };

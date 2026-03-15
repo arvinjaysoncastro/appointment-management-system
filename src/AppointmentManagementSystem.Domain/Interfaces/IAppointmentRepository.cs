@@ -8,7 +8,7 @@ public interface IAppointmentRepository
 
     Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
-    Task<bool> HasOverlapAsync(DateTime start, DateTime end, CancellationToken cancellationToken);
+    Task<bool> ExistsOverlapAsync(DateTimeOffset start, DateTimeOffset end, Guid? excludeId, CancellationToken cancellationToken);
 
     Task AddAsync(Appointment appointment, CancellationToken cancellationToken);
 

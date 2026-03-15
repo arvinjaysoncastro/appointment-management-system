@@ -14,5 +14,5 @@ public interface IAppointmentService
 
     Task DeleteAsync(Guid id, CancellationToken cancellationToken);
 
-    Task<bool> HasOverlappingAppointment(DateTime start, DateTime end, CancellationToken cancellationToken);
+    Task<bool> HasOverlappingAppointment(DateTimeOffset start, DateTimeOffset end, CancellationToken cancellationToken);
 }

@@ -19,20 +19,33 @@ public sealed class AppDbContext : DbContext
             entity.ToTable("Appointments");
 
             entity.HasKey(a => a.Id);
+            entity.Ignore(a => a.DomainEvents);
 
-            entity.Property(a => a.Title)
-                .IsRequired()
-                .HasMaxLength(200);
+            entity.OwnsOne(a => a.Title, title =>
+            {
+                title.Property(value => value.Value)
+                    .HasColumnName("Title")
+                    .IsRequired()
+                    .HasMaxLength(200);
+            });
 
             entity.Property(a => a.Description)
                 .IsRequired()
                 .HasMaxLength(2000);
 
-            entity.Property(a => a.Start)
-                .IsRequired();
+            entity.OwnsOne(a => a.TimeRange, timeRange =>
+            {
+                timeRange.Property(value => value.Start)
+                    .HasColumnName("Start")
+                    .IsRequired();
 
-            entity.Property(a => a.End)
-                .IsRequired();
+                timeRange.Property(value => value.End)
+                    .HasColumnName("End")
+                    .IsRequired();
+            });
+
+            entity.Navigation(a => a.Title).IsRequired();
+            entity.Navigation(a => a.TimeRange).IsRequired();
         });
 
         base.OnModelCreating(modelBuilder);

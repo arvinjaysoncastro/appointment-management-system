@@ -5,6 +5,6 @@ public sealed class AppointmentDto
     public Guid Id { get; init; }
     public string Title { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
-    public DateTime Start { get; init; }
-    public DateTime End { get; init; }
+    public DateTimeOffset Start { get; init; }
+    public DateTimeOffset End { get; init; }
 }
