@@ -2,7 +2,6 @@ using AppointmentManagementSystem.Application;
 using AppointmentManagementSystem.Application.Interfaces;
 using AppointmentManagementSystem.Application.Services;
 using AppointmentManagementSystem.API.Configuration;
-using AppointmentManagementSystem.Domain.Services;
 using AppointmentManagementSystem.Infrastructure;
 using AppointmentManagementSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +16,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddApplication();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
-builder.Services.AddScoped<AppointmentSchedulingService>();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();

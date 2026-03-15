@@ -41,7 +41,7 @@ public sealed class Appointment
 
         if (end <= start)
         {
-            throw new DomainException("Appointment end must be after start.");
+            throw new DomainException("Appointment end time must be after start time.");
         }
 
         Title = title.Trim();

@@ -1,73 +1,84 @@
 using AppointmentManagementSystem.Application.DTOs;
 using AppointmentManagementSystem.Application.Interfaces;
 using AppointmentManagementSystem.Domain.Entities;
+using AppointmentManagementSystem.Domain.Exceptions;
 using AppointmentManagementSystem.Domain.Interfaces;
-using AppointmentManagementSystem.Domain.Services;
 
 namespace AppointmentManagementSystem.Application.Services;
 
 public sealed class AppointmentService : IAppointmentService
 {
     private readonly IAppointmentRepository _appointmentRepository;
-    private readonly AppointmentSchedulingService _schedulingService;
 
-    public AppointmentService(
-        IAppointmentRepository appointmentRepository,
-        AppointmentSchedulingService schedulingService)
+    public AppointmentService(IAppointmentRepository appointmentRepository)
     {
         _appointmentRepository = appointmentRepository;
-        _schedulingService = schedulingService;
     }
 
-    public async Task<IEnumerable<AppointmentDto>> GetAllAsync()
+    public async Task<List<AppointmentDto>> GetAppointmentsAsync(CancellationToken cancellationToken)
     {
-        var appointments = await _appointmentRepository.GetAllAsync();
-        return appointments.Select(MapToDto);
+        var appointments = await _appointmentRepository.GetAllAsync(cancellationToken);
+        return appointments.Select(MapToDto).ToList();
     }
 
-    public async Task<AppointmentDto?> GetByIdAsync(Guid id)
+    public async Task<AppointmentDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        var appointment = await _appointmentRepository.GetByIdAsync(id);
+        var appointment = await _appointmentRepository.GetByIdAsync(id, cancellationToken);
         return appointment is null ? null : MapToDto(appointment);
     }
 
-    public async Task<AppointmentDto> CreateAsync(CreateAppointmentRequest request)
+    public async Task<AppointmentDto> CreateAsync(CreateAppointmentRequest request, CancellationToken cancellationToken)
     {
-        ValidateRequest(request);
+        ArgumentNullException.ThrowIfNull(request);
 
         var appointment = new Appointment(request.Title, request.Description, request.Start, request.End);
-        var existing = await _appointmentRepository.GetAllAsync();
 
-        _schedulingService.EnsureNoOverlap(appointment, existing);
+        if (await HasOverlappingAppointment(request.Start, request.End, cancellationToken))
+        {
+            throw new DomainException("Appointment overlaps with an existing appointment.");
+        }
 
-        await _appointmentRepository.AddAsync(appointment);
+        await _appointmentRepository.AddAsync(appointment, cancellationToken);
 
         return MapToDto(appointment);
     }
 
-    public async Task<AppointmentDto> UpdateAsync(Guid id, CreateAppointmentRequest request)
+    public async Task<AppointmentDto> UpdateAsync(Guid id, CreateAppointmentRequest request, CancellationToken cancellationToken)
     {
-        ValidateRequest(request);
+        ArgumentNullException.ThrowIfNull(request);
 
-        var existingAppointment = await _appointmentRepository.GetByIdAsync(id);
+        var existingAppointment = await _appointmentRepository.GetByIdAsync(id, cancellationToken);
         if (existingAppointment is null)
         {
             throw new KeyNotFoundException($"Appointment '{id}' was not found.");
         }
 
         var updatedAppointment = new Appointment(id, request.Title, request.Description, request.Start, request.End);
-        var allAppointments = await _appointmentRepository.GetAllAsync();
+        var appointments = await _appointmentRepository.GetAllAsync(cancellationToken);
 
-        _schedulingService.EnsureNoOverlap(updatedAppointment, allAppointments);
+        var hasOverlap = appointments.Any(appointment =>
+            appointment.Id != id &&
+            appointment.Start < request.End &&
+            appointment.End > request.Start);
 
-        await _appointmentRepository.UpdateAsync(updatedAppointment);
+        if (hasOverlap)
+        {
+            throw new DomainException("Appointment overlaps with an existing appointment.");
+        }
+
+        await _appointmentRepository.UpdateAsync(updatedAppointment, cancellationToken);
 
         return MapToDto(updatedAppointment);
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
-        await _appointmentRepository.DeleteAsync(id);
+        await _appointmentRepository.DeleteAsync(id, cancellationToken);
+    }
+
+    public Task<bool> HasOverlappingAppointment(DateTime start, DateTime end, CancellationToken cancellationToken)
+    {
+        return _appointmentRepository.HasOverlapAsync(start, end, cancellationToken);
     }
 
     private static AppointmentDto MapToDto(Appointment appointment)
@@ -80,20 +91,5 @@ public sealed class AppointmentService : IAppointmentService
             Start = appointment.Start,
             End = appointment.End
         };
-    }
-
-    private static void ValidateRequest(CreateAppointmentRequest request)
-    {
-        ArgumentNullException.ThrowIfNull(request);
-
-        if (string.IsNullOrWhiteSpace(request.Title))
-        {
-            throw new ArgumentException("Title cannot be empty.", nameof(request.Title));
-        }
-
-        if (request.End <= request.Start)
-        {
-            throw new ArgumentException("End must be after Start.");
-        }
     }
 }

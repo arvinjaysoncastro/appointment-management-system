@@ -20,16 +20,16 @@ public sealed class AppointmentsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
-        var result = await _service.GetAllAsync();
+        var result = await _service.GetAppointmentsAsync(cancellationToken);
         return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
-        var result = await _service.GetByIdAsync(id);
+        var result = await _service.GetByIdAsync(id, cancellationToken);
         if (result is null)
         {
             return NotFound();
@@ -39,25 +39,25 @@ public sealed class AppointmentsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateAppointmentRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateAppointmentRequest request, CancellationToken cancellationToken)
     {
-        var created = await _service.CreateAsync(request);
+        var created = await _service.CreateAsync(request, cancellationToken);
         _logger.LogInformation("Created appointment {AppointmentId}", created.Id);
 
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] CreateAppointmentRequest request)
+    public async Task<IActionResult> Update(Guid id, [FromBody] CreateAppointmentRequest request, CancellationToken cancellationToken)
     {
-        var updated = await _service.UpdateAsync(id, request);
+        var updated = await _service.UpdateAsync(id, request, cancellationToken);
         return Ok(updated);
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        await _service.DeleteAsync(id);
+        await _service.DeleteAsync(id, cancellationToken);
         _logger.LogInformation("Deleted appointment {AppointmentId}", id);
 
         return NoContent();

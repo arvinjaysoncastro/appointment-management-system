@@ -4,13 +4,15 @@ namespace AppointmentManagementSystem.Domain.Interfaces;
 
 public interface IAppointmentRepository
 {
-    Task<IEnumerable<Appointment>> GetAllAsync();
+    Task<List<Appointment>> GetAllAsync(CancellationToken cancellationToken);
 
-    Task<Appointment?> GetByIdAsync(Guid id);
+    Task<Appointment?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
-    Task AddAsync(Appointment appointment);
+    Task<bool> HasOverlapAsync(DateTime start, DateTime end, CancellationToken cancellationToken);
 
-    Task UpdateAsync(Appointment appointment);
+    Task AddAsync(Appointment appointment, CancellationToken cancellationToken);
 
-    Task DeleteAsync(Guid id);
+    Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken);
+
+    Task DeleteAsync(Guid id, CancellationToken cancellationToken);
 }
