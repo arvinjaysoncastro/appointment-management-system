@@ -15,11 +15,11 @@ namespace AppointmentManagementSystem.WpfClient
     /// </summary>
     public partial class App : Application
     {
-        private Microsoft.Extensions.DependencyInjection.ServiceProvider _serviceProvider;
+        private ServiceProvider _serviceProvider;
 
         public App()
         {
-            var services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
+            var services = new ServiceCollection();
             ConfigureServices(services);
             _serviceProvider = services.BuildServiceProvider();
         }
@@ -63,9 +63,10 @@ namespace AppointmentManagementSystem.WpfClient
             navigationService.Register<AppointmentsViewModel, AppointmentsView>();
             navigationService.Register<PeopleViewModel, PeopleView>();
             navigationService.Register<SettingsViewModel, SettingsView>();
-            
-            // Resolve and show MainWindow via DI container
-            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+
+            // Resolve MainWindowViewModel from DI and construct the view.
+            var mainWindowViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
+            var mainWindow = new MainWindow(mainWindowViewModel);
             mainWindow.Show();
         }
 

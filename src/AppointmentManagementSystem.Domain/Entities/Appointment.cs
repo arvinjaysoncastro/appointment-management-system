@@ -7,11 +7,13 @@ namespace AppointmentManagementSystem.Domain.Entities;
 
 public sealed class Appointment
 {
+    private readonly List<IDomainEvent> _domainEvents = new();
+
     public Guid Id { get; private set; }
     public AppointmentTitle Title { get; private set; } = null!;
     public string Description { get; private set; } = string.Empty;
     public AppointmentTimeRange TimeRange { get; private set; } = null!;
-    public List<IDomainEvent> DomainEvents { get; } = new();
+    public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents;
 
     private Appointment()
     {
@@ -55,7 +57,12 @@ public sealed class Appointment
 
     private void AddDomainEvent(IDomainEvent domainEvent)
     {
-        DomainEvents.Add(domainEvent);
+        _domainEvents.Add(domainEvent);
+    }
+
+    public void ClearDomainEvents()
+    {
+        _domainEvents.Clear();
     }
 
     public override bool Equals(object? obj)

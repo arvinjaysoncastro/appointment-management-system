@@ -55,6 +55,7 @@ public sealed class AppointmentRepository : IAppointmentRepository
     {
         await _context.Appointments.AddAsync(appointment, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+        ClearDomainEventsAfterDispatch(appointment);
     }
 
     public async Task UpdateAsync(Appointment appointment, CancellationToken cancellationToken)
@@ -65,6 +66,7 @@ public sealed class AppointmentRepository : IAppointmentRepository
         }
 
         await _context.SaveChangesAsync(cancellationToken);
+        ClearDomainEventsAfterDispatch(appointment);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
@@ -78,5 +80,11 @@ public sealed class AppointmentRepository : IAppointmentRepository
 
         _context.Appointments.Remove(appointment);
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    private static void ClearDomainEventsAfterDispatch(Appointment appointment)
+    {
+        // Future extension point: dispatch appointment.DomainEvents before clearing.
+        appointment.ClearDomainEvents();
     }
 }

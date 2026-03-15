@@ -4,6 +4,7 @@ using AppointmentManagementSystem.Application.Mappers;
 using AppointmentManagementSystem.Domain.Errors;
 using AppointmentManagementSystem.Domain.Exceptions;
 using AppointmentManagementSystem.Domain.Interfaces;
+using AppointmentManagementSystem.Domain.Services;
 using Microsoft.Extensions.Logging;
 
 namespace AppointmentManagementSystem.Application.Services;
@@ -12,15 +13,18 @@ public sealed class AppointmentService : IAppointmentService
 {
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly AppointmentMapper _appointmentMapper;
+    private readonly AppointmentSchedulingService _schedulingService;
     private readonly ILogger<AppointmentService> _logger;
 
     public AppointmentService(
         IAppointmentRepository appointmentRepository,
         AppointmentMapper appointmentMapper,
+        AppointmentSchedulingService schedulingService,
         ILogger<AppointmentService> logger)
     {
         _appointmentRepository = appointmentRepository;
         _appointmentMapper = appointmentMapper;
+        _schedulingService = schedulingService;
         _logger = logger;
     }
 
@@ -127,7 +131,8 @@ public sealed class AppointmentService : IAppointmentService
         Guid? excludeId,
         CancellationToken cancellationToken)
     {
-        return await _appointmentRepository.ExistsOverlapAsync(start, end, excludeId, cancellationToken);
+        var appointments = await _appointmentRepository.GetAllAsync(cancellationToken);
+        return _schedulingService.HasConflict(appointments, start, end, excludeId);
     }
 
 }
