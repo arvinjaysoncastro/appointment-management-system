@@ -10,7 +10,7 @@ public sealed class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Appointment> Appointments => Set<Appointment>();
+    public DbSet<Appointment> Appointments { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
