@@ -77,6 +77,10 @@
     <Compile Include="Infrastructure\ThumbDragCommandArgs.cs" />
     <Compile Include="Infrastructure\ThumbDragCommandBehavior.cs" />
     <Compile Include="Infrastructure\FocusRequestBehavior.cs" />
+    <Compile Include="Services\AppointmentFilterService.cs" />
+    <Compile Include="Services\CalendarSummaryService.cs" />
+    <Compile Include="Services\DraftValidationService.cs" />
+    <Compile Include="Services\TimelineLayoutService.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="Views\PeopleView.xaml.cs">
       <DependentUpon>PeopleView.xaml</DependentUpon>

@@ -28,6 +28,10 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         }
 
         private readonly AppointmentApiService _api;
+        private readonly DraftValidationService _draftValidationService;
+        private readonly TimelineLayoutService _timelineLayoutService;
+        private readonly CalendarSummaryService _calendarSummaryService;
+        private readonly AppointmentFilterService _appointmentFilterService;
         private readonly DispatcherTimer _currentTimeTimer;
         private AppointmentModel _selectedListAppointment;
         private TimelineAppointmentBlockViewModel _draftBlock;
@@ -332,6 +336,27 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                 OnPropertyChanged(nameof(ShowTimeError));
                 OnPropertyChanged(nameof(TitleErrorMessage));
                 OnPropertyChanged(nameof(TimeErrorMessage));
+            }
+        }
+
+        private void ApplyValidationResults(Dictionary<string, List<string>> results)
+        {
+            // Clear existing and apply new errors
+            var keys = _errors.Keys.Union(results?.Keys ?? Enumerable.Empty<string>()).ToList();
+            foreach (var key in keys)
+            {
+                ClearErrors(key);
+            }
+
+            if (results == null)
+                return;
+
+            foreach (var kv in results)
+            {
+                foreach (var msg in kv.Value)
+                {
+                    AddError(kv.Key, msg);
+                }
             }
         }
 
@@ -672,9 +697,17 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         public ICommand CreateAppointmentCommand { get; }
         public ICommand UpdateAppointmentCommand { get; }
 
-        public AppointmentsViewModel(AppointmentApiService api)
+        public AppointmentsViewModel(AppointmentApiService api,
+            DraftValidationService draftValidationService,
+            TimelineLayoutService timelineLayoutService,
+            CalendarSummaryService calendarSummaryService,
+            AppointmentFilterService appointmentFilterService)
         {
             _api = api ?? throw new ArgumentNullException(nameof(api));
+            _draftValidationService = draftValidationService ?? throw new ArgumentNullException(nameof(draftValidationService));
+            _timelineLayoutService = timelineLayoutService ?? throw new ArgumentNullException(nameof(timelineLayoutService));
+            _calendarSummaryService = calendarSummaryService ?? throw new ArgumentNullException(nameof(calendarSummaryService));
+            _appointmentFilterService = appointmentFilterService ?? throw new ArgumentNullException(nameof(appointmentFilterService));
             _selectedDate = DateTime.Today;
             Appointments = new ObservableCollection<AppointmentModel>();
             TodayAppointments = new ObservableCollection<AppointmentModel>();
@@ -1038,67 +1071,27 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                 return;
             }
 
+            var mapped = TimelineLayoutService.DragMode.None;
+            switch (dragMode)
+            {
+                case DragMode.Move:
+                    mapped = TimelineLayoutService.DragMode.Move;
+                    break;
+                case DragMode.ResizeStart:
+                    mapped = TimelineLayoutService.DragMode.ResizeStart;
+                    break;
+                case DragMode.ResizeEnd:
+                    mapped = TimelineLayoutService.DragMode.ResizeEnd;
+                    break;
+            }
+
             var draft = DraftBlock.Appointment;
-            var dayStart = draft.Start.Date;
-            var dayEnd = dayStart.AddDays(1).AddMinutes(-1);
-            var duration = EnsureMinimumDuration(draft.End - draft.Start);
-
-            if (dragMode == DragMode.Move)
+            var updated = _timelineLayoutService.ApplyDragDelta(mapped, minuteDelta, draft);
+            if (updated != null && DraftBlock?.Appointment != null)
             {
-                var proposedStart = draft.Start.AddMinutes(minuteDelta);
-                if (proposedStart < dayStart)
-                {
-                    proposedStart = dayStart;
-                }
-
-                var latestStart = dayEnd.Subtract(duration);
-                if (proposedStart > latestStart)
-                {
-                    proposedStart = latestStart;
-                }
-
-                draft.Start = proposedStart;
-                draft.End = proposedStart.Add(duration);
-                UpdateDraftState(dayStart);
-                return;
-            }
-
-            if (dragMode == DragMode.ResizeStart)
-            {
-                var maxStart = draft.End.AddMinutes(-MinimumDurationMinutes);
-                var proposedStart = draft.Start.AddMinutes(minuteDelta);
-
-                if (proposedStart < dayStart)
-                {
-                    proposedStart = dayStart;
-                }
-
-                if (proposedStart > maxStart)
-                {
-                    proposedStart = maxStart;
-                }
-
-                draft.Start = proposedStart;
-                UpdateDraftState(dayStart);
-                return;
-            }
-
-            if (dragMode == DragMode.ResizeEnd)
-            {
-                var minEnd = draft.Start.AddMinutes(MinimumDurationMinutes);
-                var proposedEnd = draft.End.AddMinutes(minuteDelta);
-
-                if (proposedEnd > dayEnd)
-                {
-                    proposedEnd = dayEnd;
-                }
-
-                if (proposedEnd < minEnd)
-                {
-                    proposedEnd = minEnd;
-                }
-
-                draft.End = proposedEnd;
+                DraftBlock.Appointment.Start = updated.Start;
+                DraftBlock.Appointment.End = updated.End;
+                var dayStart = DraftBlock.Appointment.Start.Date;
                 UpdateDraftState(dayStart);
             }
         }
@@ -1119,19 +1112,9 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         {
             _currentTimelineDay = day.Date;
             TimelineHours.Clear();
-
-            for (var hour = 0; hour <= 23; hour++)
-            {
-                var start = day.Date.AddHours(hour);
-                var end = start.AddHours(1).AddMinutes(-1);
-
-                TimelineHours.Add(new TimelineHourViewModel
-                {
-                    Hour = hour,
-                    Start = start,
-                    End = end
-                });
-            }
+            var hours = _timelineLayoutService.GenerateTimelineHours(day);
+            foreach (var h in hours)
+                TimelineHours.Add(h);
         }
 
         private void RebuildTimeline(DateTime day)
@@ -1170,29 +1153,9 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private void BuildTimelineBlocks(DateTime day)
         {
             TimelineBlocks.Clear();
-
-            foreach (var appointment in Appointments)
-            {
-                if (appointment.Start.Date != day.Date)
-                {
-                    continue;
-                }
-
-                if (DraftSourceAppointmentId.HasValue && appointment.Id == DraftSourceAppointmentId.Value)
-                {
-                    continue;
-                }
-
-                TimelineBlocks.Add(CreateSavedBlock(appointment));
-            }
-
-            if (DraftBlock != null && DraftBlock.Appointment.Start.Date == day.Date)
-            {
-                DraftBlock.IsDraft = true;
-                DraftBlock.ShowDetails = ShowAllDescriptions;
-                DraftBlock.RecalculateLayout();
-                TimelineBlocks.Add(DraftBlock);
-            }
+            var blocks = _timelineLayoutService.BuildTimelineBlocks(Appointments, DraftBlock, day, DraftSourceAppointmentId, ShowAllDescriptions);
+            foreach (var b in blocks)
+                TimelineBlocks.Add(b);
         }
 
         private void ToggleBlockDetails(object parameter)
@@ -1234,21 +1197,10 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                 GenerateTimelineHours(day);
             }
 
-            foreach (var slot in TimelineHours)
-            {
-                slot.Appointments.Clear();
-            }
-
-            foreach (var block in TimelineBlocks)
-            {
-                var appointment = block.Appointment;
-                if (appointment == null || appointment.Start.Date != day.Date)
-                {
-                    continue;
-                }
-
-                TimelineHours[appointment.Start.Hour].Appointments.Add(appointment);
-            }
+            var updated = _timelineLayoutService.AssignAppointmentsToTimeline(TimelineHours.ToList(), TimelineBlocks.ToList(), day);
+            TimelineHours.Clear();
+            foreach (var h in updated)
+                TimelineHours.Add(h);
         }
 
         private void UpdateDraftConflictState()
@@ -1258,14 +1210,8 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                 return;
             }
 
-            var draft = DraftBlock.Appointment;
-            var hasConflict = Appointments.Any(existing =>
-                existing.Start.Date == draft.Start.Date &&
-                (!DraftSourceAppointmentId.HasValue || existing.Id != DraftSourceAppointmentId.Value) &&
-                draft.Start < existing.End &&
-                draft.End > existing.Start);
-
-            // Mark conflicting state and expose validation error so UI and commands can react
+            var errors = _draftValidationService.ValidateDraft(DraftBlock.Appointment, DraftBlock, DraftSourceAppointmentId, Appointments);
+            var hasConflict = errors.ContainsKey("TimeRange");
             DraftBlock.IsConflicting = hasConflict;
             CommandManager.InvalidateRequerySuggested();
         }
@@ -1274,6 +1220,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         {
             UpdateDraftConflictState();
             AssignAppointmentsToTimeline(day);
+
             if (DraftBlock == null || DraftBlock.Appointment == null)
             {
                 HasValidationError = false;
@@ -1281,39 +1228,9 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                 return;
             }
 
-            var appt = DraftBlock.Appointment;
+            var validationResults = _draftValidationService.ValidateDraft(DraftBlock.Appointment, DraftBlock, DraftSourceAppointmentId, Appointments);
+            ApplyValidationResults(validationResults);
 
-            // Title required
-            ClearErrors(nameof(Title));
-            if (string.IsNullOrWhiteSpace(appt.Title))
-            {
-                AddError(nameof(Title), "Title is required");
-            }
-
-            // Time range validation (also mark selector properties so controls show errors)
-            ClearErrors(nameof(Start));
-            ClearErrors(nameof(End));
-            ClearErrors(nameof(SelectedStartDate));
-            ClearErrors(nameof(SelectedEndDate));
-            if (appt.Start >= appt.End)
-            {
-                AddError(nameof(Start), "Start must be before End");
-                AddError(nameof(End), "End must be after Start");
-                AddError(nameof(SelectedStartDate), "Start must be before End");
-                AddError(nameof(SelectedEndDate), "End must be after Start");
-            }
-
-            // Overlap validation exposed under a synthetic 'TimeRange' key
-            if (DraftBlock.IsConflicting)
-            {
-                AddError("TimeRange", "Appointment overlaps another appointment");
-            }
-            else
-            {
-                ClearErrors("TimeRange");
-            }
-
-            // Keep the draft block's validation flag tied to overlapping state
             DraftBlock.HasValidationError = DraftBlock.IsConflicting;
             HasValidationError = DraftBlock.HasValidationError || HasErrors;
             CommandManager.InvalidateRequerySuggested();
@@ -1493,296 +1410,47 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private void RefreshDashboardOverview()
         {
             TodayAppointments.Clear();
-
             var now = DateTime.Now;
-            var normalizedSearch = (SearchQuery ?? string.Empty).Trim();
-            var isSearching = !string.IsNullOrWhiteSpace(normalizedSearch);
+            var isSearching = !string.IsNullOrWhiteSpace((SearchQuery ?? string.Empty).Trim());
 
-            IEnumerable<AppointmentModel> scope = isSearching
-                ? Appointments
-                : GetAppointmentsForSelectedPeriod();
+            var result = _appointmentFilterService.RefreshDashboardOverview(Appointments, SearchQuery, isSearching, SelectedViewMode, SelectedFilter, now, SelectedDate);
 
-            if (isSearching)
-            {
-                scope = scope
-                    .Where(appointment => MatchesSearchQuery(appointment, normalizedSearch, now))
-                    .ToList();
+            TodayFilterCount = result.TodayFilterCount;
+            UpcomingFilterCount = result.UpcomingFilterCount;
+            PastFilterCount = result.PastFilterCount;
 
-                TodayFilterCount = FilterBySchedule(scope, ScheduleFilter.Today, now).Count();
-                UpcomingFilterCount = FilterBySchedule(scope, ScheduleFilter.Upcoming, now).Count();
-                PastFilterCount = FilterBySchedule(scope, ScheduleFilter.Past, now).Count();
-
-                scope = FilterBySchedule(scope, SelectedFilter, now);
-            }
-            else
-            {
-                TodayFilterCount = 0;
-                UpcomingFilterCount = 0;
-                PastFilterCount = 0;
-            }
-
-            var filteredAppointments = scope
-                .OrderBy(appointment => appointment.Start)
-                .ToList();
-
-            foreach (var appointment in filteredAppointments)
-            {
+            foreach (var appointment in result.FilteredAppointments)
                 TodayAppointments.Add(appointment);
-            }
 
-            var totalMinutes = filteredAppointments.Sum(appointment => Math.Max(0d, (appointment.End - appointment.Start).TotalMinutes));
-            TodayTotalScheduledTimeText = FormatDuration(totalMinutes);
+            TodayTotalScheduledTimeText = FormatDuration(result.TotalMinutes);
             OnPropertyChanged(nameof(TodayAppointmentsCount));
             OnPropertyChanged(nameof(HasTodayAppointments));
         }
 
-        private static IEnumerable<AppointmentModel> FilterBySchedule(IEnumerable<AppointmentModel> appointments, ScheduleFilter filter, DateTime now)
-        {
-            switch (filter)
-            {
-                case ScheduleFilter.Upcoming:
-                    return appointments.Where(appointment => appointment.Start > now);
-                case ScheduleFilter.Past:
-                    return appointments.Where(appointment => appointment.End < now);
-                default:
-                    return appointments.Where(appointment => appointment.Start.Date == now.Date);
-            }
-        }
+        
 
-        private IEnumerable<AppointmentModel> GetAppointmentsForSelectedPeriod()
-        {
-            switch (SelectedViewMode)
-            {
-                case CalendarViewMode.Week:
-                    var weekStart = GetStartOfWeek(SelectedDate.Date);
-                    var weekEnd = weekStart.AddDays(7);
-                    return Appointments.Where(appointment => appointment.Start >= weekStart && appointment.Start < weekEnd);
+        
 
-                case CalendarViewMode.Month:
-                    var monthStart = new DateTime(SelectedDate.Year, SelectedDate.Month, 1);
-                    var monthEnd = monthStart.AddMonths(1);
-                    return Appointments.Where(appointment => appointment.Start >= monthStart && appointment.Start < monthEnd);
+        
 
-                case CalendarViewMode.Year:
-                    var yearStart = new DateTime(SelectedDate.Year, 1, 1);
-                    var yearEnd = yearStart.AddYears(1);
-                    return Appointments.Where(appointment => appointment.Start >= yearStart && appointment.Start < yearEnd);
-
-                default:
-                    return Appointments.Where(appointment => appointment.Start.Date == SelectedDate.Date);
-            }
-        }
-
-        private static bool MatchesSearchQuery(AppointmentModel appointment, string query, DateTime now)
-        {
-            if (appointment == null)
-            {
-                return false;
-            }
-
-            var trimmedQuery = (query ?? string.Empty).Trim();
-            if (trimmedQuery.Length == 0)
-            {
-                return true;
-            }
-
-            var comparison = StringComparison.OrdinalIgnoreCase;
-            var title = appointment.Title ?? string.Empty;
-            var description = appointment.Description ?? string.Empty;
-            var notes = ReadOptionalSearchProperty(appointment, "Notes");
-            var metadata = ReadOptionalSearchProperty(appointment, "Metadata") + " " +
-                           ReadOptionalSearchProperty(appointment, "MetadataText");
-            var startTimeText = appointment.Start.ToString("HH:mm");
-            var endTimeText = appointment.End.ToString("HH:mm");
-
-            var titleMatches = title.IndexOf(trimmedQuery, comparison) >= 0;
-            var descriptionMatches = description.IndexOf(trimmedQuery, comparison) >= 0;
-            var notesMatches = notes.IndexOf(trimmedQuery, comparison) >= 0;
-            var metadataMatches = metadata.IndexOf(trimmedQuery, comparison) >= 0;
-            var startMatches = startTimeText.IndexOf(trimmedQuery, comparison) >= 0;
-            var endMatches = endTimeText.IndexOf(trimmedQuery, comparison) >= 0;
-
-            if (titleMatches || descriptionMatches || notesMatches || metadataMatches || startMatches || endMatches)
-            {
-                return true;
-            }
-
-            var loweredQuery = trimmedQuery.ToLowerInvariant();
-            if (ContainsDateKeyword(loweredQuery, appointment, now))
-            {
-                return true;
-            }
-
-            if (ContainsDayPeriodKeyword(loweredQuery, appointment.Start))
-            {
-                return true;
-            }
-
-            if (TryParseSearchTime(trimmedQuery, out var parsedTime, out var toleranceMinutes))
-            {
-                var minutesFromMidnight = appointment.Start.Hour * 60 + appointment.Start.Minute;
-                var delta = Math.Abs(minutesFromMidnight - parsedTime);
-                return delta <= toleranceMinutes;
-            }
-
-            return false;
-        }
-
-        private static string ReadOptionalSearchProperty(AppointmentModel appointment, string propertyName)
-        {
-            if (appointment == null || string.IsNullOrWhiteSpace(propertyName))
-            {
-                return string.Empty;
-            }
-
-            var property = appointment.GetType().GetProperty(propertyName);
-            if (property == null)
-            {
-                return string.Empty;
-            }
-
-            var value = property.GetValue(appointment, null);
-            return value == null ? string.Empty : value.ToString();
-        }
-
-        private static bool ContainsDateKeyword(string loweredQuery, AppointmentModel appointment, DateTime now)
-        {
-            if (loweredQuery.IndexOf("today", StringComparison.Ordinal) >= 0)
-            {
-                return appointment.Start.Date == now.Date;
-            }
-
-            if (loweredQuery.IndexOf("tomorrow", StringComparison.Ordinal) >= 0)
-            {
-                return appointment.Start.Date == now.Date.AddDays(1);
-            }
-
-            return false;
-        }
-
-        private static bool ContainsDayPeriodKeyword(string loweredQuery, DateTime start)
-        {
-            var hour = start.Hour;
-
-            if (loweredQuery.IndexOf("morning", StringComparison.Ordinal) >= 0)
-            {
-                return hour >= 5 && hour < 12;
-            }
-
-            if (loweredQuery.IndexOf("afternoon", StringComparison.Ordinal) >= 0)
-            {
-                return hour >= 12 && hour < 17;
-            }
-
-            if (loweredQuery.IndexOf("evening", StringComparison.Ordinal) >= 0)
-            {
-                return hour >= 17 && hour < 23;
-            }
-
-            return false;
-        }
-
-        private static bool TryParseSearchTime(string query, out int minutesFromMidnight, out int toleranceMinutes)
-        {
-            minutesFromMidnight = 0;
-            toleranceMinutes = 0;
-
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                return false;
-            }
-
-            var normalized = query.Trim().ToLowerInvariant();
-
-            DateTime parsed;
-            if (DateTime.TryParseExact(normalized, new[] { "h:mmtt", "htt", "h tt", "h:mm tt", "h:mm", "HH:mm" }, CultureInfo.InvariantCulture, DateTimeStyles.None, out parsed))
-            {
-                minutesFromMidnight = parsed.Hour * 60 + parsed.Minute;
-                toleranceMinutes = normalized.Contains(":") ? 15 : 59;
-                return true;
-            }
-
-            int hour;
-            if (int.TryParse(normalized, out hour) && hour >= 0 && hour <= 23)
-            {
-                minutesFromMidnight = hour * 60;
-                toleranceMinutes = 59;
-                return true;
-            }
-
-            return false;
-        }
+        
 
         private void RefreshCalendarSummaries()
         {
-            BuildWeekDaySummaries();
-            BuildMonthDaySummaries();
-            BuildYearMonthSummaries();
-        }
-
-        private void BuildWeekDaySummaries()
-        {
+            var week = _calendarSummaryService.BuildWeekDaySummaries(Appointments, SelectedDate);
             WeekDaySummaries.Clear();
-            var weekStart = GetStartOfWeek(SelectedDate.Date);
+            foreach (var s in week) WeekDaySummaries.Add(s);
 
-            for (var i = 0; i < 7; i++)
-            {
-                var date = weekStart.AddDays(i);
-                WeekDaySummaries.Add(CreateCalendarDaySummary(date, true));
-            }
-        }
-
-        private void BuildMonthDaySummaries()
-        {
+            var month = _calendarSummaryService.BuildMonthDaySummaries(Appointments, SelectedDate);
             MonthDaySummaries.Clear();
+            foreach (var s in month) MonthDaySummaries.Add(s);
 
-            var firstOfMonth = new DateTime(SelectedDate.Year, SelectedDate.Month, 1);
-            var gridStart = GetStartOfWeek(firstOfMonth);
-
-            for (var i = 0; i < 42; i++)
-            {
-                var date = gridStart.AddDays(i);
-                var isInCurrentMonth = date.Month == SelectedDate.Month && date.Year == SelectedDate.Year;
-                MonthDaySummaries.Add(CreateCalendarDaySummary(date, isInCurrentMonth));
-            }
-        }
-
-        private void BuildYearMonthSummaries()
-        {
+            var year = _calendarSummaryService.BuildYearMonthSummaries(Appointments, SelectedDate);
             YearMonthSummaries.Clear();
-
-            for (var month = 1; month <= 12; month++)
-            {
-                var monthStart = new DateTime(SelectedDate.Year, month, 1);
-                var monthEnd = monthStart.AddMonths(1);
-                var monthAppointments = Appointments
-                    .Where(appointment => appointment.Start >= monthStart && appointment.Start < monthEnd)
-                    .ToList();
-                var totalMinutes = monthAppointments.Sum(appointment => Math.Max(0d, (appointment.End - appointment.Start).TotalMinutes));
-
-                YearMonthSummaries.Add(new CalendarMonthSummary
-                {
-                    MonthStart = monthStart,
-                    MonthName = monthStart.ToString("MMMM"),
-                    AppointmentCount = monthAppointments.Count,
-                    TotalScheduledTimeText = FormatDuration(totalMinutes)
-                });
-            }
+            foreach (var s in year) YearMonthSummaries.Add(s);
         }
 
-        private CalendarDaySummary CreateCalendarDaySummary(DateTime date, bool isInCurrentMonth)
-        {
-            var dayAppointments = Appointments.Where(appointment => appointment.Start.Date == date.Date).ToList();
-            var totalMinutes = dayAppointments.Sum(appointment => Math.Max(0d, (appointment.End - appointment.Start).TotalMinutes));
-
-            return new CalendarDaySummary
-            {
-                Date = date.Date,
-                AppointmentCount = dayAppointments.Count,
-                TotalScheduledTimeText = FormatDuration(totalMinutes),
-                IsInCurrentMonth = isInCurrentMonth
-            };
-        }
+        
 
         private void SelectCalendarDate(object parameter)
         {

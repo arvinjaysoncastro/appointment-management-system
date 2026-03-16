@@ -41,6 +41,12 @@ namespace AppointmentManagementSystem.WpfClient
             services.AddSingleton(configuredHttpClient);
             services.AddSingleton<AppointmentApiService>();
 
+            // New services for refactored responsibilities
+            services.AddSingleton<DraftValidationService>();
+            services.AddSingleton<TimelineLayoutService>();
+            services.AddSingleton<CalendarSummaryService>();
+            services.AddSingleton<AppointmentFilterService>();
+
             services.AddTransient<AppointmentsViewModel>();
             services.AddTransient<PeopleViewModel>();
             services.AddTransient<SettingsViewModel>();
