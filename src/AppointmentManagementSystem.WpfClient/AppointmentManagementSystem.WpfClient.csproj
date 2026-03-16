@@ -64,6 +64,9 @@
     <Compile Include="DateTimeOffsetToDateTimeConverter.cs" />
     <Compile Include="AppointmentDurationTextConverter.cs" />
     <Compile Include="AppointmentIndicatorOpacityConverter.cs" />
+    <Compile Include="DTOs\AppointmentDetailsDto.cs" />
+    <Compile Include="DTOs\AppointmentSummaryDto.cs" />
+    <Compile Include="DTOs\CreateAppointmentDto.cs" />
     <Compile Include="EmptyStringToVisibilityConverter.cs" />
     <Compile Include="SearchMatchConverter.cs" />
     <Compile Include="NotNullToVisibilityConverter.cs" />

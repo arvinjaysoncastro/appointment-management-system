@@ -4,6 +4,7 @@ using System.Windows.Input;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
 using AppointmentManagementSystem.WpfClient.Models;
 using AppointmentManagementSystem.WpfClient.Services;
+using AppointmentManagementSystem.WpfClient.DTOs;
 
 namespace AppointmentManagementSystem.WpfClient.ViewModels
 {
