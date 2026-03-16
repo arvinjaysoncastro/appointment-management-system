@@ -13,6 +13,10 @@
         <local:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
         <local:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
         <local:DateTimeOffsetToDateTimeConverter x:Key="DateTimeOffsetToDateTimeConverter"/>
+        <local:AppointmentDurationTextConverter x:Key="AppointmentDurationTextConverter"/>
+        <local:AppointmentIndicatorOpacityConverter x:Key="AppointmentIndicatorOpacityConverter"/>
+        <local:EmptyStringToVisibilityConverter x:Key="EmptyStringToVisibilityConverter"/>
+        <local:SearchMatchConverter x:Key="SearchMatchConverter"/>
         <local:SelectedAppointmentToHeaderConverter x:Key="SelectedAppointmentToHeaderConverter"/>
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <local:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter"/>

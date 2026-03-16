@@ -62,6 +62,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DateTimeOffsetToDateTimeConverter.cs" />
+    <Compile Include="AppointmentDurationTextConverter.cs" />
+    <Compile Include="AppointmentIndicatorOpacityConverter.cs" />
+    <Compile Include="EmptyStringToVisibilityConverter.cs" />
+    <Compile Include="SearchMatchConverter.cs" />
     <Compile Include="NotNullToVisibilityConverter.cs" />
     <Compile Include="NullToVisibilityConverter.cs" />
     <Compile Include="SelectedAppointmentToHeaderConverter.cs" />
@@ -69,6 +73,10 @@
     <Compile Include="Infrastructure\AsyncRelayCommandOfT.cs" />
     <Compile Include="Infrastructure\IAsyncInitializable.cs" />
     <Compile Include="Infrastructure\RelayCommandOfT.cs" />
+    <Compile Include="Infrastructure\ScrollViewerOffsetBehavior.cs" />
+    <Compile Include="Infrastructure\ThumbDragCommandArgs.cs" />
+    <Compile Include="Infrastructure\ThumbDragCommandBehavior.cs" />
+    <Compile Include="Infrastructure\FocusRequestBehavior.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="Views\PeopleView.xaml.cs">
       <DependentUpon>PeopleView.xaml</DependentUpon>
@@ -96,6 +104,8 @@
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="StringToVisibilityConverter.cs" />
     <Compile Include="ViewModels\AppointmentsViewModel.cs" />
+    <Compile Include="ViewModels\TimelineHourViewModel.cs" />
+    <Compile Include="ViewModels\TimelineAppointmentBlockViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\PeopleViewModel.cs" />
     <Compile Include="Views\AppointmentsView.xaml.cs">

@@ -3,9 +3,581 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:infra="clr-namespace:AppointmentManagementSystem.WpfClient.Infrastructure"
              mc:Ignorable="d"
              d:DesignHeight="520"
              d:DesignWidth="900">
+
+    <UserControl.Resources>
+        <Style x:Key="PrimaryToolbarButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="#2563EB" />
+            <Setter Property="BorderBrush" Value="#2563EB" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="16,9" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#1D4ED8" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#1D4ED8" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#1E40AF" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#1E3A8A" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.6" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryToolbarButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#334155" />
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#CBD5E1" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="14,9" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#F8FAFC" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#94A3B8" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#F1F5F9" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#64748B" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.6" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SegmentedToggleButtonStyle" TargetType="ToggleButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#334155" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="SegmentButton"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="SegmentButton" Property="Background" Value="#2563EB" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SegmentButton" Property="Background" Value="#E2E8F0" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsChecked" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="SegmentButton" Property="Background" Value="#1D4ED8" />
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="OverviewSegmentedFilterToggleStyle" TargetType="ToggleButton">
+            <Setter Property="Foreground" Value="#374151" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="#D1D5DB" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="SegmentBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="SegmentBorder" Property="Background" Value="#2563EB" />
+                                <Setter TargetName="SegmentBorder" Property="BorderBrush" Value="#2563EB" />
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SegmentBorder" Property="Background" Value="#F3F4F6" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsChecked" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="SegmentBorder" Property="Background" Value="#1D4ED8" />
+                                <Setter TargetName="SegmentBorder" Property="BorderBrush" Value="#1D4ED8" />
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="SegmentBorder" Property="Opacity" Value="0.6" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="EditorPrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="#2563EB" />
+            <Setter Property="BorderBrush" Value="#2563EB" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="9">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#1D4ED8" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#1E40AF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="EditorDeleteButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#DC2626" />
+            <Setter Property="Background" Value="#F8FAFC" />
+            <Setter Property="BorderBrush" Value="#E2E8F0" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="9">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#F1F5F9" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#CBD5E1" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="EditorCancelButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#334155" />
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#CBD5E1" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="9">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#F8FAFC" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#94A3B8" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="DashboardTemplate">
+            <StackPanel>
+                <Border Background="#FFFFFF"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        Padding="12">
+                    <StackPanel>
+                        <TextBlock Text="{Binding OverviewTitle}"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="#111827"
+                                   Margin="0,0,0,6" />
+
+                        <TextBlock Text="{Binding SearchFilterSummary}"
+                                   FontSize="12"
+                                   Foreground="#64748B"
+                                   Margin="0,0,0,12"
+                                   Visibility="{Binding IsSearching, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                        <StackPanel Visibility="{Binding IsSearching, Converter={StaticResource InvertBoolToVisibilityConverter}}">
+                            <Border Background="#F8FAFC"
+                                    BorderBrush="#E2E8F0"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="12"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding OverviewAppointmentsLabel}"
+                                               FontSize="12"
+                                               Foreground="#64748B" />
+                                    <TextBlock Text="{Binding TodayAppointmentsCount}"
+                                               FontSize="24"
+                                               FontWeight="SemiBold"
+                                               Foreground="#0F172A" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#F8FAFC"
+                                    BorderBrush="#E2E8F0"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="12"
+                                    Margin="0,0,0,16">
+                                <StackPanel>
+                                    <TextBlock Text="Total Scheduled Time"
+                                               FontSize="12"
+                                               Foreground="#64748B" />
+                                    <TextBlock Text="{Binding TodayTotalScheduledTimeText}"
+                                               FontSize="24"
+                                               FontWeight="SemiBold"
+                                               Foreground="#0F172A" />
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Text="{Binding OverviewScheduleLabel}"
+                                       FontSize="15"
+                                       FontWeight="SemiBold"
+                                       Foreground="#111827"
+                                       Margin="0,0,0,10" />
+                        </StackPanel>
+
+                        <ItemsControl ItemsSource="{Binding TodayAppointments}"
+                                      Visibility="{Binding HasTodayAppointments, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding DataContext.SelectAppointmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            BorderThickness="0"
+                                            Background="Transparent"
+                                            Padding="0"
+                                            Margin="0,0,0,10"
+                                            HorizontalContentAlignment="Stretch"
+                                            Cursor="Hand">
+                                        <Border BorderBrush="#E5E7EB"
+                                                BorderThickness="1"
+                                                CornerRadius="10"
+                                                Padding="12"
+                                                HorizontalAlignment="Stretch">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#FFFFFF" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                                            <Setter Property="Background" Value="#F9FAFB" />
+                                                            <Setter Property="BorderBrush" Value="#D1D5DB" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+
+                                            <StackPanel>
+                                                <TextBlock FontWeight="SemiBold"
+                                                           Foreground="#2563EB">
+                                                    <Run Text="{Binding Start, StringFormat={}{0:HH:mm}}" />
+                                                    <Run Text=" - " />
+                                                    <Run Text="{Binding End, StringFormat={}{0:HH:mm}}" />
+                                                    <Run Text="  (" Foreground="#6B7280" />
+                                                    <Run Text="{Binding ., Converter={StaticResource AppointmentDurationTextConverter}}" Foreground="#6B7280" />
+                                                    <Run Text=")" Foreground="#6B7280" />
+                                                </TextBlock>
+
+                                                <TextBlock Text="{Binding Title}"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"
+                                                           Margin="0,4,0,0">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Value="True">
+                                                                    <DataTrigger.Binding>
+                                                                        <MultiBinding Converter="{StaticResource SearchMatchConverter}">
+                                                                            <Binding Path="Title" />
+                                                                            <Binding Path="DataContext.SearchQuery" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                                                        </MultiBinding>
+                                                                    </DataTrigger.Binding>
+                                                                    <Setter Property="FontWeight" Value="Bold" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+
+                                                <TextBlock Text="{Binding Description}"
+                                                           Margin="0,2,0,0"
+                                                           Foreground="#6B7280"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           TextWrapping="NoWrap">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="FontWeight" Value="Normal" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Value="True">
+                                                                    <DataTrigger.Binding>
+                                                                        <MultiBinding Converter="{StaticResource SearchMatchConverter}">
+                                                                            <Binding Path="Description" />
+                                                                            <Binding Path="DataContext.SearchQuery" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                                                        </MultiBinding>
+                                                                    </DataTrigger.Binding>
+                                                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                                                    <Setter Property="Foreground" Value="#334155" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+
+                                                <ItemsControl ItemsSource="{Binding ., Converter={StaticResource AppointmentIndicatorOpacityConverter}}"
+                                                              Margin="0,6,0,0">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <StackPanel Orientation="Horizontal" />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Width="8" Height="8" Margin="0,0,6,0">
+                                                                <Ellipse Fill="#D1D5DB" Width="8" Height="8" />
+                                                                <Ellipse Fill="#2563EB" Width="8" Height="8" Opacity="{Binding}" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </Border>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Border Background="#F8FAFC"
+                                BorderBrush="#E2E8F0"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12"
+                                Visibility="{Binding HasTodayAppointments, Converter={StaticResource InvertBoolToVisibilityConverter}}">
+                            <StackPanel>
+                                <TextBlock Text="No appointments found"
+                                           Foreground="#334155"
+                                           FontWeight="SemiBold" />
+                                <Button Content="Create new appointment"
+                                        Command="{Binding CreateDraftCommand}"
+                                        Margin="0,8,0,0"
+                                        HorizontalAlignment="Left"
+                                        Style="{StaticResource SecondaryToolbarButtonStyle}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="EditorTemplate">
+            <StackPanel>
+                <TextBlock FontSize="16"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,12"
+                           Text="Create Appointment"
+                           Visibility="{Binding IsEditingDraft, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
+                <TextBlock FontSize="16"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,12"
+                           Text="Edit Appointment"
+                           Visibility="{Binding IsEditingDraft, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                <TextBlock Text="Title" Margin="0,0,0,4" />
+                <TextBox Text="{Binding DraftBlock.Appointment.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,6,0,12" />
+
+                <TextBlock Text="Description" Margin="0,0,0,4" />
+                <TextBox Text="{Binding DraftBlock.Appointment.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         AcceptsReturn="True"
+                         Height="72"
+                         TextWrapping="Wrap"
+                         Margin="0,6,0,12" />
+
+                <TextBlock Text="Time" Margin="0,0,0,4" FontWeight="SemiBold" Foreground="#334155" />
+                <Grid Margin="0,6,0,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="28" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Start" Foreground="#64748B" FontSize="11" Margin="0,0,0,4" />
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="End" Foreground="#64748B" FontSize="11" Margin="0,0,0,4" />
+
+                    <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,4,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="88" />
+                        </Grid.ColumnDefinitions>
+
+                        <DatePicker SelectedDate="{Binding SelectedStartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <ComboBox Grid.Column="2"
+                                  ItemsSource="{Binding TimeOptions}"
+                                  SelectedItem="{Binding SelectedStartTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </Grid>
+
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="1"
+                               Text="→"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="#94A3B8"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+
+                    <Grid Grid.Row="1" Grid.Column="2" Margin="4,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="88" />
+                        </Grid.ColumnDefinitions>
+
+                        <DatePicker SelectedDate="{Binding SelectedEndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <ComboBox Grid.Column="2"
+                                  ItemsSource="{Binding TimeOptions}"
+                                  SelectedItem="{Binding SelectedEndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </Grid>
+                </Grid>
+
+                <TextBlock Text="Duration" Foreground="#64748B" FontSize="11" />
+                <TextBlock Text="{Binding EditorDurationText}"
+                           Margin="0,6,0,12"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           Foreground="#1E3A8A" />
+
+                <Border Height="1"
+                        Background="#E5E7EB"
+                        Margin="0,4,0,12" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Cancel"
+                        Command="{Binding CancelDraftCommand}"
+                        Style="{StaticResource EditorCancelButtonStyle}"
+                        Margin="0,0,8,0" />
+                    <Button Content="Delete"
+                            Command="{Binding DeleteAppointmentCommand}"
+                            Style="{StaticResource EditorDeleteButtonStyle}"
+                            Margin="0,0,8,0"
+                            Visibility="{Binding IsEditingDraft, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <Button Content="Save"
+                            Command="{Binding SaveAppointmentCommand}"
+                            Style="{StaticResource EditorPrimaryButtonStyle}" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <UserControl.InputBindings>
+        <KeyBinding Modifiers="Control"
+                    Key="K"
+                    Command="{Binding FocusSearchCommand}" />
+    </UserControl.InputBindings>
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
@@ -13,24 +585,719 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-            <Button Content="Refresh" Command="{Binding LoadAppointmentsCommand}" Width="90" Margin="0,0,8,0" />
-            <Button Content="Create" Command="{Binding CreateAppointmentCommand}" Width="90" Margin="0,0,8,0" />
-            <Button Content="Edit" Command="{Binding UpdateAppointmentCommand}" Width="90" Margin="0,0,8,0" />
-            <Button Content="Delete" Command="{Binding DeleteAppointmentCommand}" Width="90" />
-        </StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <DataGrid Grid.Row="1"
-                  ItemsSource="{Binding Appointments}"
-                  SelectedItem="{Binding SelectedAppointment, Mode=TwoWay}"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  CanUserAddRows="False">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*" />
-                <DataGridTextColumn Header="Start" Binding="{Binding Start, StringFormat={}{0:g}}" Width="160" />
-                <DataGridTextColumn Header="End" Binding="{Binding End, StringFormat={}{0:g}}" Width="160" />
-            </DataGrid.Columns>
-        </DataGrid>
+        <Grid Grid.Row="0"
+              Grid.ColumnSpan="3"
+              Margin="20,16,20,12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Row="0"
+                        Grid.Column="0"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Margin="0,0,0,12">
+                <Button Content="+ New Appointment"
+                        Command="{Binding CreateDraftCommand}"
+                        Style="{StaticResource PrimaryToolbarButtonStyle}"
+                        Margin="0,0,10,0" />
+                <Button Content="Refresh"
+                        Command="{Binding LoadAppointmentsCommand}"
+                        Style="{StaticResource SecondaryToolbarButtonStyle}" />
+            </StackPanel>
+
+            <Border Grid.Row="0"
+                    Grid.Column="2"
+                    Margin="0,0,0,12"
+                    Background="#F3F4F6"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="12,0"
+                    Height="34"
+                    VerticalAlignment="Center">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               VerticalAlignment="Center"
+                               Margin="0,0,8,0"
+                               Foreground="#64748B"
+                               FontSize="13"
+                               Text="&#xE721;"
+                               FontFamily="Segoe MDL2 Assets" />
+
+                    <Grid Grid.Column="1">
+                        <TextBox x:Name="OverviewSearchTextBox"
+                                 Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Foreground="#0F172A"
+                                 CaretBrush="#0F172A"
+                                 FontSize="13"
+                                 VerticalContentAlignment="Center"
+                                 Padding="0"
+                                 infra:FocusRequestBehavior.FocusRequestId="{Binding SearchFocusRequestId}"
+                                 ToolTip="Search appointments by title, description, or time" />
+
+                        <TextBlock Text="Search appointments, notes, or times..."
+                                   IsHitTestVisible="False"
+                                   VerticalAlignment="Center"
+                                   Foreground="#94A3B8"
+                                   FontSize="13"
+                                   Visibility="{Binding SearchQuery, Converter={StaticResource EmptyStringToVisibilityConverter}}" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="0"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <Button Content="&#x2039;"
+                        Width="32"
+                        Height="32"
+                        VerticalAlignment="Center"
+                        Command="{Binding PreviousDateCommand}"
+                        Style="{StaticResource SecondaryToolbarButtonStyle}" />
+
+                <ToggleButton x:Name="DateNavigationToggle"
+                              Margin="12,0"
+                              BorderThickness="0"
+                              VerticalAlignment="Center"
+                              Background="Transparent">
+                    <TextBlock Text="{Binding SelectedDateText}"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="#1F2937"
+                               VerticalAlignment="Center" />
+                </ToggleButton>
+
+                <Button Content="&#x203A;"
+                        Width="32"
+                        Height="32"
+                        VerticalAlignment="Center"
+                        Command="{Binding NextDateCommand}"
+                        Style="{StaticResource SecondaryToolbarButtonStyle}" />
+
+                <Border Background="#F3F4F6"
+                        BorderBrush="#CBD5E1"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Padding="4"
+                        Margin="16,0,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <ToggleButton Content="Day"
+                                      IsChecked="{Binding IsDayView, Mode=OneWay}"
+                                      Command="{Binding SetDayViewCommand}"
+                                      Style="{StaticResource SegmentedToggleButtonStyle}"
+                                      Margin="0,0,4,0"
+                                      Width="58" />
+                        <ToggleButton Content="Week"
+                                      IsChecked="{Binding IsWeekView, Mode=OneWay}"
+                                      Command="{Binding SetWeekViewCommand}"
+                                      Style="{StaticResource SegmentedToggleButtonStyle}"
+                                      Margin="0,0,4,0"
+                                      Width="58" />
+                        <ToggleButton Content="Month"
+                                      IsChecked="{Binding IsMonthView, Mode=OneWay}"
+                                      Command="{Binding SetMonthViewCommand}"
+                                      Style="{StaticResource SegmentedToggleButtonStyle}"
+                                      Margin="0,0,4,0"
+                                      Width="64" />
+                        <ToggleButton Content="Year"
+                                      IsChecked="{Binding IsYearView, Mode=OneWay}"
+                                      Command="{Binding SetYearViewCommand}"
+                                      Style="{StaticResource SegmentedToggleButtonStyle}"
+                                      Width="58" />
+                    </StackPanel>
+                </Border>
+
+                <Popup Placement="Bottom"
+                       PlacementTarget="{Binding ElementName=DateNavigationToggle}"
+                       StaysOpen="False"
+                       AllowsTransparency="True"
+                       IsOpen="{Binding IsChecked, ElementName=DateNavigationToggle, Mode=TwoWay}">
+                    <Border Background="White"
+                            BorderBrush="#CBD5E1"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="8"
+                            Margin="0,6,0,0">
+                        <DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </Border>
+                </Popup>
+            </StackPanel>
+
+            <Border Grid.Row="1"
+                    Grid.Column="2"
+                    Background="#F3F4F6"
+                    CornerRadius="12"
+                    Padding="4"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Opacity" Value="0.45" />
+                        <Setter Property="IsHitTestVisible" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSearching}" Value="True">
+                                <Setter Property="Opacity" Value="1" />
+                                <Setter Property="IsHitTestVisible" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel Orientation="Horizontal">
+                    <ToggleButton Width="84"
+                                  Margin="0,0,6,0"
+                                  IsChecked="{Binding IsTodayQuickFilter, Mode=OneWay}"
+                                  Command="{Binding SetSelectedFilterCommand}"
+                                  CommandParameter="Today"
+                                  Style="{StaticResource OverviewSegmentedFilterToggleStyle}">
+                        <ToggleButton.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Today" />
+                                <TextBlock Text=" " />
+                                <TextBlock Text="{Binding TodayFilterCount}" />
+                            </StackPanel>
+                        </ToggleButton.Content>
+                    </ToggleButton>
+                    <ToggleButton Width="104"
+                                  Margin="0,0,6,0"
+                                  IsChecked="{Binding IsUpcomingQuickFilter, Mode=OneWay}"
+                                  Command="{Binding SetSelectedFilterCommand}"
+                                  CommandParameter="Upcoming"
+                                  Style="{StaticResource OverviewSegmentedFilterToggleStyle}">
+                        <ToggleButton.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Upcoming" />
+                                <TextBlock Text=" " />
+                                <TextBlock Text="{Binding UpcomingFilterCount}" />
+                            </StackPanel>
+                        </ToggleButton.Content>
+                    </ToggleButton>
+                    <ToggleButton Width="76"
+                                  IsChecked="{Binding IsPastQuickFilter, Mode=OneWay}"
+                                  Command="{Binding SetSelectedFilterCommand}"
+                                  CommandParameter="Past"
+                                  Style="{StaticResource OverviewSegmentedFilterToggleStyle}">
+                        <ToggleButton.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Past" />
+                                <TextBlock Text=" " />
+                                <TextBlock Text="{Binding PastFilterCount}" />
+                            </StackPanel>
+                        </ToggleButton.Content>
+                    </ToggleButton>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="1"
+                Grid.Column="0"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1"
+                CornerRadius="6"
+            Background="White"
+            Visibility="{Binding IsDayView, Converter={StaticResource BoolToVisibilityConverter}}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          infra:ScrollViewerOffsetBehavior.VerticalOffset="{Binding TimelineScrollOffset}"
+                          infra:ScrollViewerOffsetBehavior.ScrollRequestId="{Binding TimelineScrollRequestId}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="72" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <ItemsControl Grid.Column="0"
+                                  Height="{Binding TimelineHeight}"
+                                  ItemsSource="{Binding TimelineHours}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Height="{Binding DataContext.HourRowHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        Padding="8,2,4,0">
+                                    <Grid>
+                                        <TextBlock Text="{Binding Start, StringFormat={}{0:h tt}}"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="13"
+                                                   Foreground="#111827"
+                                                   Visibility="{Binding HasAppointments, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                        <TextBlock Text="{Binding Start, StringFormat={}{0:h tt}}"
+                                                   FontSize="11"
+                                                   Foreground="#9CA3AF"
+                                                   Visibility="{Binding HasAppointments, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Grid Grid.Column="1"
+                          x:Name="TimelineSurfaceHost"
+                          Height="{Binding TimelineHeight}">
+                        <ItemsControl ItemsSource="{Binding TimelineHours}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Background="Transparent"
+                                            BorderThickness="0"
+                                            Padding="0"
+                                            HorizontalContentAlignment="Stretch"
+                                            VerticalContentAlignment="Stretch"
+                                            Command="{Binding DataContext.SelectTimeSlotCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding Start}">
+                                        <Border Height="{Binding DataContext.HourRowHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                BorderBrush="#EEF0F4"
+                                                BorderThickness="0,0,0,1"
+                                                Padding="8,2,8,0">
+                                            <TextBlock Text="No appointments"
+                                                       FontSize="11"
+                                                       Foreground="#9CA3AF"
+                                                       Visibility="{Binding HasAppointments, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
+                                        </Border>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Canvas Height="{Binding TimelineHeight}"
+                                Width="{Binding ElementName=TimelineSurfaceHost, Path=ActualWidth}">
+                            <ItemsControl ItemsSource="{Binding TimelineBlocks}"
+                                          Width="{Binding ElementName=TimelineSurfaceHost, Path=ActualWidth}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="Canvas.Top" Value="{Binding TopOffset}" />
+                                        <Setter Property="Canvas.Left" Value="8" />
+                                        <Setter Property="Canvas.Right" Value="8" />
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Height="{Binding BlockHeight}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="6" />
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="6" />
+                                            </Grid.RowDefinitions>
+
+                                            <Thumb Grid.Row="0"
+                                                   Cursor="SizeNS"
+                                                   Height="6"
+                                                   infra:ThumbDragCommandBehavior.DragDeltaCommand="{Binding DataContext.ResizeAppointmentStartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   infra:ThumbDragCommandBehavior.DragDeltaCommandParameter="{Binding}"
+                                                   infra:ThumbDragCommandBehavior.MouseDownCommand="{Binding DataContext.SelectAppointmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   infra:ThumbDragCommandBehavior.MouseDownCommandParameter="{Binding Appointment}">
+                                                <Thumb.Style>
+                                                    <Style TargetType="Thumb">
+                                                        <Setter Property="Background" Value="Transparent" />
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsDraft}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Thumb.Style>
+                                            </Thumb>
+
+                                            <Thumb Grid.Row="1"
+                              Cursor="SizeAll"
+                                                   infra:ThumbDragCommandBehavior.DragDeltaCommand="{Binding DataContext.DragAppointmentBlockCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   infra:ThumbDragCommandBehavior.MouseDownCommand="{Binding DataContext.SelectAppointmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   infra:ThumbDragCommandBehavior.MouseDownCommandParameter="{Binding Appointment}"
+                                                   infra:ThumbDragCommandBehavior.DragDeltaCommandParameter="{Binding}">
+                                                <Thumb.Style>
+                                                    <Style TargetType="Thumb">
+                                                        <Setter Property="Background" Value="White" />
+                                                        <Setter Property="BorderBrush" Value="#D1D5DB" />
+                                                        <Setter Property="BorderThickness" Value="1" />
+                                                        <Setter Property="Padding" Value="10,8" />
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="Thumb">
+                                                                    <Border Background="{TemplateBinding Background}"
+                                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                                            CornerRadius="4"
+                                                                            Padding="{TemplateBinding Padding}">
+                                                                        <StackPanel>
+                                                                            <DockPanel LastChildFill="True">
+                                                                                <Button DockPanel.Dock="Right"
+                                                                                        Padding="4,0"
+                                                                                        FontSize="10"
+                                                                                        Margin="6,0,0,0"
+                                                                                        Command="{Binding DataContext.ToggleBlockDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                                        CommandParameter="{Binding}"
+                                                                                        Visibility="{Binding HasDescription, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                                                    <Button.Style>
+                                                                                        <Style TargetType="Button">
+                                                                                            <Setter Property="Content" Value="Show" />
+                                                                                            <Style.Triggers>
+                                                                                                <DataTrigger Binding="{Binding ShowDetails}" Value="True">
+                                                                                                    <Setter Property="Content" Value="Hide" />
+                                                                                                </DataTrigger>
+                                                                                            </Style.Triggers>
+                                                                                        </Style>
+                                                                                    </Button.Style>
+                                                                                </Button>
+
+                                                                                <TextBlock Text="{Binding Title}"
+                                                                                           FontWeight="SemiBold"
+                                                                                           Foreground="#111827" />
+                                                                            </DockPanel>
+                                                                            <TextBlock Text="{Binding TimeRange}"
+                                                                                       FontSize="11"
+                                                                                       Foreground="#4B5563" />
+                                                                            <TextBlock Text="{Binding DurationText}"
+                                                                                       FontSize="11"
+                                                                                       Foreground="#1D4ED8" />
+                                                                            <ItemsControl ItemsSource="{Binding TimerCircleOpacities}" Margin="0,2,0,0">
+                                                                                <ItemsControl.ItemsPanel>
+                                                                                    <ItemsPanelTemplate>
+                                                                                        <StackPanel Orientation="Horizontal" />
+                                                                                    </ItemsPanelTemplate>
+                                                                                </ItemsControl.ItemsPanel>
+                                                                                <ItemsControl.ItemTemplate>
+                                                                                    <DataTemplate>
+                                                                                        <Grid Width="12" Height="12" Margin="0,0,4,0">
+                                                                                            <Ellipse Fill="#E5E7EB" Width="12" Height="12" />
+                                                                                            <Ellipse Fill="#2563EB" Width="12" Height="12" Opacity="{Binding}" />
+                                                                                        </Grid>
+                                                                                    </DataTemplate>
+                                                                                </ItemsControl.ItemTemplate>
+                                                                            </ItemsControl>
+                                                                            <TextBlock Text="{Binding Description}"
+                                                                                       FontSize="11"
+                                                                                       Foreground="#6B7280"
+                                                                                       TextWrapping="Wrap"
+                                                                                       Visibility="{Binding ShowDetails, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                                                        </StackPanel>
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsDraft}" Value="True">
+                                                                <Setter Property="Background" Value="#DBEAFE" />
+                                                                <Setter Property="BorderBrush" Value="#60A5FA" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsConflicting}" Value="True">
+                                                                <Setter Property="Background" Value="#FECACA" />
+                                                                <Setter Property="BorderBrush" Value="#DC2626" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsDraft}" Value="False">
+                                                                <Setter Property="Cursor" Value="Arrow" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Thumb.Style>
+                                            </Thumb>
+
+                                            <Thumb Grid.Row="2"
+                                                   Cursor="SizeNS"
+                                                   Height="6"
+                                                   infra:ThumbDragCommandBehavior.DragDeltaCommand="{Binding DataContext.ResizeAppointmentEndCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   infra:ThumbDragCommandBehavior.DragDeltaCommandParameter="{Binding}"
+                                                   infra:ThumbDragCommandBehavior.MouseDownCommand="{Binding DataContext.SelectAppointmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   infra:ThumbDragCommandBehavior.MouseDownCommandParameter="{Binding Appointment}">
+                                                <Thumb.Style>
+                                                    <Style TargetType="Thumb">
+                                                        <Setter Property="Background" Value="Transparent" />
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsDraft}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsConflicting}" Value="True">
+                                                                <Setter Property="Background" Value="#FECACA" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Thumb.Style>
+                                            </Thumb>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Canvas>
+
+                        <Canvas Height="{Binding TimelineHeight}"
+                                Width="{Binding ElementName=TimelineSurfaceHost, Path=ActualWidth}"
+                                IsHitTestVisible="False">
+                            <Grid Width="{Binding ElementName=TimelineSurfaceHost, Path=ActualWidth}"
+                                  Canvas.Top="{Binding CurrentTimeMarkerTopOffset}"
+                                  Visibility="{Binding IsCurrentTimeMarkerVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Border Height="2"
+                                        Background="#E53935"
+                                        VerticalAlignment="Top" />
+                                <Border Background="White"
+                                        BorderBrush="#FCA5A5"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="6,1"
+                                        Margin="8,-10,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top">
+                                    <TextBlock Text="{Binding CurrentTimeMarkerLabel}"
+                                               Foreground="#E53935"
+                                               FontSize="11"
+                                               FontWeight="SemiBold" />
+                                </Border>
+                            </Grid>
+                        </Canvas>
+                    </Grid>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+
+        <Border Grid.Row="1"
+                Grid.Column="0"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1"
+                CornerRadius="6"
+                Background="White"
+                Visibility="{Binding IsWeekView, Converter={StaticResource BoolToVisibilityConverter}}">
+            <StackPanel Margin="12">
+                <TextBlock Text="Week"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           Foreground="#0F172A"
+                           Margin="0,0,0,10" />
+
+                <ItemsControl ItemsSource="{Binding WeekDaySummaries}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="7" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DataContext.SelectCalendarDateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding Date}"
+                                    Margin="8"
+                                    Padding="0"
+                                    BorderThickness="0"
+                                    Background="Transparent"
+                                    HorizontalAlignment="Stretch">
+                                <Border BorderBrush="#E2E8F0"
+                                        BorderThickness="1"
+                                        CornerRadius="12"
+                                        Padding="10"
+                                        Background="#FFFFFF"
+                                        MinWidth="110"
+                                        HorizontalAlignment="Stretch">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Date, StringFormat={}{0:ddd dd}}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#1E293B" />
+                                        <TextBlock Text="{Binding AppointmentCount, StringFormat={}Appointments: {0}}"
+                                                   Margin="0,8,0,2"
+                                                   FontSize="11"
+                                                   Foreground="#475569" />
+                                        <TextBlock Text="{Binding TotalScheduledTimeText, StringFormat={}Total: {0}}"
+                                                   FontSize="11"
+                                                   Foreground="#1D4ED8" />
+                                    </StackPanel>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#FFFFFF" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                                    <Setter Property="Background" Value="#F3F4F6" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                </Border>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1"
+                Grid.Column="0"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1"
+                CornerRadius="6"
+                Background="White"
+                Visibility="{Binding IsMonthView, Converter={StaticResource BoolToVisibilityConverter}}">
+            <StackPanel Margin="12">
+                <TextBlock Text="{Binding CurrentMonthText}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           Foreground="#0F172A"
+                           Margin="16,12,0,12" />
+
+                <UniformGrid Columns="7" Margin="4,0,4,8">
+                    <TextBlock Text="Mon" HorizontalAlignment="Center" Foreground="#64748B" FontSize="11" />
+                    <TextBlock Text="Tue" HorizontalAlignment="Center" Foreground="#64748B" FontSize="11" />
+                    <TextBlock Text="Wed" HorizontalAlignment="Center" Foreground="#64748B" FontSize="11" />
+                    <TextBlock Text="Thu" HorizontalAlignment="Center" Foreground="#64748B" FontSize="11" />
+                    <TextBlock Text="Fri" HorizontalAlignment="Center" Foreground="#64748B" FontSize="11" />
+                    <TextBlock Text="Sat" HorizontalAlignment="Center" Foreground="#64748B" FontSize="11" />
+                    <TextBlock Text="Sun" HorizontalAlignment="Center" Foreground="#64748B" FontSize="11" />
+                </UniformGrid>
+
+                <ItemsControl ItemsSource="{Binding MonthDaySummaries}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="7" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DataContext.SelectCalendarDateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding Date}"
+                                    Margin="10"
+                                    Padding="0"
+                                    BorderThickness="0"
+                                    Background="Transparent"
+                                    HorizontalAlignment="Stretch">
+                                <Border BorderBrush="#E2E8F0"
+                                        BorderThickness="1"
+                                        CornerRadius="12"
+                                        Padding="8"
+                                        MinHeight="82"
+                                        MinWidth="110"
+                                        Background="#FFFFFF"
+                                        HorizontalAlignment="Stretch">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Date, StringFormat={}{0:dd}}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#0F172A" />
+                                        <TextBlock Text="{Binding AppointmentCount, StringFormat={}Appts: {0}}"
+                                                   Margin="0,6,0,1"
+                                                   FontSize="10"
+                                                   Foreground="#64748B" />
+                                        <TextBlock Text="{Binding TotalScheduledTimeText}"
+                                                   FontSize="10"
+                                                   Foreground="#1D4ED8" />
+                                    </StackPanel>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#FFFFFF" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                                    <Setter Property="Background" Value="#F3F4F6" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                </Border>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1"
+                Grid.Column="0"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1"
+                CornerRadius="6"
+                Background="White"
+                Visibility="{Binding IsYearView, Converter={StaticResource BoolToVisibilityConverter}}">
+            <StackPanel Margin="12">
+                <TextBlock Text="{Binding SelectedDate, StringFormat={}{0:yyyy}}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           Foreground="#0F172A"
+                           Margin="16,12,0,12" />
+
+                <ItemsControl ItemsSource="{Binding YearMonthSummaries}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DataContext.SelectCalendarMonthCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}"
+                                    Margin="8"
+                                    Padding="0"
+                                    BorderThickness="0"
+                                    Background="Transparent"
+                                    HorizontalAlignment="Stretch">
+                                <Border Padding="10"
+                                        CornerRadius="12"
+                                        Background="White"
+                                        BorderBrush="#E5E7EB"
+                                        BorderThickness="1"
+                                        MinWidth="110"
+                                        HorizontalAlignment="Stretch">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding MonthName}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#0F172A"
+                                                   Margin="0,0,0,4" />
+                                        <TextBlock Text="{Binding AppointmentCount, StringFormat={}{0} appointments}"
+                                                   FontSize="11"
+                                                   Foreground="#64748B" />
+                                        <TextBlock Text="{Binding TotalScheduledTimeText}"
+                                                   FontSize="11"
+                                                   Foreground="#1D4ED8" />
+                                    </StackPanel>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#FFFFFF" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                                    <Setter Property="Background" Value="#F3F4F6" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                </Border>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1"
+                Grid.Column="2"
+                Padding="12"
+                Background="White"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1"
+                CornerRadius="6">
+            <ContentControl Content="{Binding}">
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Setter Property="ContentTemplate" Value="{StaticResource DashboardTemplate}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsEditorMode}" Value="True">
+                                <Setter Property="ContentTemplate" Value="{StaticResource EditorTemplate}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
+        </Border>
     </Grid>
 </UserControl>
