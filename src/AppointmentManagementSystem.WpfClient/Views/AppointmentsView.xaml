@@ -324,10 +324,33 @@
                                     <TextBlock Text="{Binding OverviewAppointmentsLabel}"
                                                FontSize="12"
                                                Foreground="#64748B" />
-                                    <TextBlock Text="{Binding TodayAppointmentsCount}"
-                                               FontSize="24"
-                                               FontWeight="SemiBold"
-                                               Foreground="#0F172A" />
+                                    <Grid>
+                                        <TextBlock Text="{Binding TodayAppointmentsCount}"
+                                                   FontSize="24"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#0F172A"
+                                                   Visibility="{Binding IsTimelineLoading, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
+                                        <Rectangle Height="24" RadiusX="6" RadiusY="6"
+                                                   Visibility="{Binding IsTimelineLoading, Converter={StaticResource BoolToVis}}" HorizontalAlignment="Stretch">
+                                            <Rectangle.Fill>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                    <GradientStop Color="#F3F4F6" Offset="0" />
+                                                    <GradientStop Color="#E6EEF9" Offset="-0.5" />
+                                                    <GradientStop Color="#F3F4F6" Offset="1" />
+                                                </LinearGradientBrush>
+                                            </Rectangle.Fill>
+                                            <Rectangle.Triggers>
+                                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetProperty="(Shape.Fill).(LinearGradientBrush.GradientStops)[1].Offset"
+                                                                             From="-0.5" To="1.5" Duration="0:0:1.2" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Rectangle.Triggers>
+                                        </Rectangle>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
 
@@ -341,10 +364,34 @@
                                     <TextBlock Text="Total Scheduled Time"
                                                FontSize="12"
                                                Foreground="#64748B" />
-                                    <TextBlock Text="{Binding TodayTotalScheduledTimeText}"
-                                               FontSize="24"
-                                               FontWeight="SemiBold"
-                                               Foreground="#0F172A" />
+                                    <Grid>
+                                        <TextBlock Text="{Binding TodayTotalScheduledTimeText}"
+                                                   FontSize="24"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#0F172A"
+                                                   Visibility="{Binding IsTimelineLoading, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
+                                        <Rectangle Height="24" RadiusX="6" RadiusY="6"
+                                                   Visibility="{Binding IsTimelineLoading, Converter={StaticResource BoolToVis}}"
+                                                   HorizontalAlignment="Stretch">
+                                            <Rectangle.Fill>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                    <GradientStop Color="#F3F4F6" Offset="0" />
+                                                    <GradientStop Color="#E6EEF9" Offset="-0.5" />
+                                                    <GradientStop Color="#F3F4F6" Offset="1" />
+                                                </LinearGradientBrush>
+                                            </Rectangle.Fill>
+                                            <Rectangle.Triggers>
+                                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetProperty="(Shape.Fill).(LinearGradientBrush.GradientStops)[1].Offset"
+                                                                             From="-0.5" To="1.5" Duration="0:0:1.2" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Rectangle.Triggers>
+                                        </Rectangle>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
 
@@ -985,23 +1032,63 @@
                         <ItemsControl ItemsSource="{Binding TimelineHours}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Button Background="Transparent"
-                                            BorderThickness="0"
-                                            Padding="0"
-                                            HorizontalContentAlignment="Stretch"
-                                            VerticalContentAlignment="Stretch"
-                                            Command="{Binding DataContext.SelectTimeSlotCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            CommandParameter="{Binding Start}">
+                                    <Grid>
+                                        <!-- Actual interactive slot, hidden while foundation is shown -->
+                                        <Button Background="Transparent"
+                                                BorderThickness="0"
+                                                Padding="0"
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                Command="{Binding DataContext.SelectTimeSlotCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding Start}"
+                                                Visibility="{Binding DataContext.IsTimelineLoading, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InvertBoolToVisibilityConverter}}">
+                                            <Border Height="{Binding DataContext.HourRowHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    BorderBrush="#EEF0F4"
+                                                    BorderThickness="0,0,0,1"
+                                                    Padding="8,2,8,0">
+                                                <TextBlock Text="No appointments"
+                                                           FontSize="11"
+                                                           Foreground="#9CA3AF"
+                                                           Visibility="{Binding HasAppointments, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
+                                            </Border>
+                                        </Button>
+
+                                        <!-- Foundation shimmer shown while loading -->
                                         <Border Height="{Binding DataContext.HourRowHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 BorderBrush="#EEF0F4"
                                                 BorderThickness="0,0,0,1"
-                                                Padding="8,2,8,0">
-                                            <TextBlock Text="No appointments"
-                                                       FontSize="11"
-                                                       Foreground="#9CA3AF"
-                                                       Visibility="{Binding HasAppointments, Converter={StaticResource InvertBoolToVisibilityConverter}}" />
+                                                Padding="8,2,8,0"
+                                                Background="Transparent"
+                                                Visibility="{Binding DataContext.IsTimelineLoading, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}">
+                                            <Grid>
+                                                <Rectangle x:Name="ShimmerRect"
+                                                           RadiusX="4"
+                                                           RadiusY="4"
+                                                           Height="18"
+                                                           HorizontalAlignment="Stretch"
+                                                           VerticalAlignment="Center">
+                                                    <Rectangle.Fill>
+                                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                            <GradientStop Color="#F3F4F6" Offset="0" />
+                                                            <GradientStop Color="#E6EEF9" Offset="-0.5" />
+                                                            <GradientStop Color="#F3F4F6" Offset="1" />
+                                                        </LinearGradientBrush>
+                                                    </Rectangle.Fill>
+                                                </Rectangle>
+                                                <Grid.Triggers>
+                                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                        <BeginStoryboard>
+                                                            <Storyboard RepeatBehavior="Forever">
+                                                                <DoubleAnimation Storyboard.TargetName="ShimmerRect"
+                                                                                 Storyboard.TargetProperty="(Shape.Fill).(LinearGradientBrush.GradientStops)[1].Offset"
+                                                                                 From="-0.5" To="1.5" Duration="0:0:1.2" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger>
+                                                </Grid.Triggers>
+                                            </Grid>
                                         </Border>
-                                    </Button>
+                                    </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>

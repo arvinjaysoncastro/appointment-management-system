@@ -52,6 +52,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private string _selectedEndTime;
         private bool _isSyncingEditorDateTimeFields;
         private bool _isReloadingForSelectedDate;
+        private bool _isTimelineLoading;
         private CalendarViewMode _calendarViewMode;
         private double _timelineScrollOffset;
         private int _timelineScrollRequestId;
@@ -75,6 +76,12 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         public ObservableCollection<CalendarDaySummary> WeekDaySummaries { get; }
         public ObservableCollection<CalendarDaySummary> MonthDaySummaries { get; }
         public ObservableCollection<CalendarMonthSummary> YearMonthSummaries { get; }
+
+        public bool IsTimelineLoading
+        {
+            get => _isTimelineLoading;
+            set => SetProperty(ref _isTimelineLoading, value);
+        }
 
         public double HourRowHeight => 60d * TimelineAppointmentBlockViewModel.PixelsPerMinute;
         public double TimelineHeight => 24d * 60d * TimelineAppointmentBlockViewModel.PixelsPerMinute;
@@ -788,6 +795,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
 
         private async Task LoadAppointmentsAsync()
         {
+            IsTimelineLoading = true;
             try
             {
                 var data = await _api.GetAppointmentsAsync();
@@ -805,6 +813,10 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to load appointments. {ex.Message}", "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsTimelineLoading = false;
             }
         }
 
