@@ -9,6 +9,8 @@
              d:DesignWidth="900">
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <Style x:Key="PrimaryToolbarButtonStyle" TargetType="Button">
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Background" Value="#2563EB" />
@@ -502,11 +504,46 @@
                            Text="Edit Appointment"
                            Visibility="{Binding IsEditingDraft, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-                <TextBlock Text="Title" Margin="0,0,0,4" />
-                <TextBox Text="{Binding DraftBlock.Appointment.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Margin="0,6,0,12" />
+                <TextBlock Margin="0,0,0,4">
+                    <Run Text="Title" />
+                    <Run Text=" *" Foreground="Red" />
+                </TextBlock>
+                <TextBox x:Name="TitleBox"
+                         Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         Margin="0,6,0,2"
+                         LostFocus="TitleBox_LostFocus">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="BorderBrush" Value="#CBD5E1" />
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding ShowTitleError}" Value="True" />
+                                        <Condition Binding="{Binding TitleTouched}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="BorderBrush" Value="Red" />
+                                    <Setter Property="BorderThickness" Value="1" />
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding ShowTitleError}" Value="True" />
+                                        <Condition Binding="{Binding SaveAttempted}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="BorderBrush" Value="Red" />
+                                    <Setter Property="BorderThickness" Value="1" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+                <TextBlock Foreground="Red" FontSize="12" Margin="0,0,0,10"
+                           Visibility="{Binding ShowTitleError, Converter={StaticResource BoolToVis}}"
+                           Text="{Binding TitleErrorMessage}" />
 
-                <TextBlock Text="Description" Margin="0,0,0,4" />
+                <TextBlock Margin="0,0,0,4">
+                    <Run Text="Description" />
+                </TextBlock>
                 <TextBox Text="{Binding DraftBlock.Appointment.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          AcceptsReturn="True"
                          Height="72"
@@ -535,10 +572,39 @@
                             <ColumnDefinition Width="88" />
                         </Grid.ColumnDefinitions>
 
-                        <DatePicker SelectedDate="{Binding SelectedStartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <ComboBox Grid.Column="2"
-                                  ItemsSource="{Binding TimeOptions}"
-                                  SelectedItem="{Binding SelectedStartTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Border>
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowTimeError}" Value="True">
+                                            <Setter Property="BorderBrush" Value="Red" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <DatePicker x:Name="StartDatePicker" SelectedDate="{Binding SelectedStartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" LostFocus="TimeField_LostFocus" />
+                        </Border>
+                        <Border Grid.Column="2">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowTimeError}" Value="True">
+                                            <Setter Property="BorderBrush" Value="Red" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <ComboBox x:Name="StartTimeCombo"
+                                      ItemsSource="{Binding TimeOptions}"
+                                      SelectedItem="{Binding SelectedStartTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      LostFocus="TimeField_LostFocus" />
+                        </Border>
                     </Grid>
 
                     <TextBlock Grid.Row="1"
@@ -557,12 +623,45 @@
                             <ColumnDefinition Width="88" />
                         </Grid.ColumnDefinitions>
 
-                        <DatePicker SelectedDate="{Binding SelectedEndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <ComboBox Grid.Column="2"
-                                  ItemsSource="{Binding TimeOptions}"
-                                  SelectedItem="{Binding SelectedEndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Border>
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowTimeError}" Value="True">
+                                            <Setter Property="BorderBrush" Value="Red" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <DatePicker x:Name="EndDatePicker" SelectedDate="{Binding SelectedEndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" LostFocus="TimeField_LostFocus" />
+                        </Border>
+                        <Border Grid.Column="2">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowTimeError}" Value="True">
+                                            <Setter Property="BorderBrush" Value="Red" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <ComboBox x:Name="EndTimeCombo"
+                                      ItemsSource="{Binding TimeOptions}"
+                                      SelectedItem="{Binding SelectedEndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      LostFocus="TimeField_LostFocus" />
+                        </Border>
                     </Grid>
                 </Grid>
+
+                <TextBlock Foreground="Red" FontSize="12" Margin="0,4,0,8"
+                           Visibility="{Binding ShowTimeError, Converter={StaticResource BoolToVis}}"
+                           Text="{Binding TimeErrorMessage}" />
 
                 <TextBlock Text="Duration" Foreground="#64748B" FontSize="11" />
                 <TextBlock Text="{Binding EditorDurationText}"
@@ -585,9 +684,21 @@
                             Style="{StaticResource EditorDeleteButtonStyle}"
                             Margin="0,0,8,0"
                             Visibility="{Binding IsEditingDraft, Converter={StaticResource BoolToVisibilityConverter}}" />
-                        <Button Content="Save"
-                            Command="{Binding SaveDraftCommand}"
-                            Style="{StaticResource BlurDisabledButtonStyle}" />
+                            <Grid>
+                            <!-- Visual save button that shows disabled style when not allowed -->
+                            <Button x:Name="SaveVisualButton"
+                                Content="Save"
+                                Command="{Binding SaveDraftCommand}"
+                                IsEnabled="{Binding IsSaveAllowed}"
+                                Style="{StaticResource BlurDisabledButtonStyle}" />
+
+                            <!-- Transparent click-catcher shown when save is not allowed; it triggers AttemptSaveCommand to surface validation -->
+                            <Button Background="Transparent"
+                                BorderThickness="0"
+                                Command="{Binding AttemptSaveCommand}"
+                                Visibility="{Binding IsSaveAllowed, Converter={StaticResource InvertBoolToVisibilityConverter}}"
+                                ToolTip="Complete required fields to enable Save" />
+                            </Grid>
                 </StackPanel>
             </StackPanel>
         </DataTemplate>

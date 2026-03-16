@@ -15,5 +15,21 @@ namespace AppointmentManagementSystem.WpfClient.Views
         {
             InitializeComponent();
         }
+
+        private void TitleBox_LostFocus(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (DataContext is AppointmentsViewModel vm)
+            {
+                vm.TitleTouched = true;
+            }
+        }
+
+        private void TimeField_LostFocus(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (DataContext is AppointmentsViewModel vm)
+            {
+                vm.TimeTouched = true;
+            }
+        }
     }
 }

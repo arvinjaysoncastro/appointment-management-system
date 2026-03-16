@@ -15,7 +15,7 @@ using AppointmentManagementSystem.WpfClient.Enums;
 
 namespace AppointmentManagementSystem.WpfClient.ViewModels
 {
-    public sealed class AppointmentsViewModel : ViewModelBase, IAsyncInitializable
+    public sealed class AppointmentsViewModel : ViewModelBase, IAsyncInitializable, INotifyDataErrorInfo
     {
         private const int MinimumDurationMinutes = 5;
 
@@ -58,6 +58,10 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private int _upcomingFilterCount;
         private int _pastFilterCount;
         private bool _hasValidationError;
+        private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
+        private bool _titleTouched;
+        private bool _timeTouched;
+        private bool _saveAttempted;
 
         public ObservableCollection<AppointmentModel> Appointments { get; }
         public ObservableCollection<AppointmentModel> TodayAppointments { get; }
@@ -201,7 +205,133 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                     _hasValidationError = value;
                     OnPropertyChanged();
                     CommandManager.InvalidateRequerySuggested();
+                    OnPropertyChanged(nameof(IsSaveAllowed));
                 }
+            }
+        }
+
+        // UI flags to control when per-field validation messages are shown
+        public bool TitleTouched
+        {
+            get => _titleTouched;
+            set
+            {
+                if (SetProperty(ref _titleTouched, value))
+                {
+                    OnPropertyChanged(nameof(ShowTitleError));
+                }
+            }
+        }
+
+        public bool TimeTouched
+        {
+            get => _timeTouched;
+            set
+            {
+                if (SetProperty(ref _timeTouched, value))
+                {
+                    OnPropertyChanged(nameof(ShowTimeError));
+                }
+            }
+        }
+
+        public bool SaveAttempted
+        {
+            get => _saveAttempted;
+            private set
+            {
+                if (SetProperty(ref _saveAttempted, value))
+                {
+                    OnPropertyChanged(nameof(ShowTitleError));
+                    OnPropertyChanged(nameof(ShowTimeError));
+                    OnPropertyChanged(nameof(TitleErrorMessage));
+                    OnPropertyChanged(nameof(TimeErrorMessage));
+                }
+            }
+        }
+
+        public bool ShowTitleError =>
+            ((GetErrors(nameof(Title)) as IEnumerable<string>)?.Any() == true) && (TitleTouched || SaveAttempted);
+
+        public bool ShowTimeError
+        {
+            get
+            {
+                var hasTimeError = ((GetErrors(nameof(Start)) as IEnumerable<string>)?.Any() == true)
+                                   || ((GetErrors(nameof(End)) as IEnumerable<string>)?.Any() == true)
+                                   || ((GetErrors(nameof(SelectedStartDate)) as IEnumerable<string>)?.Any() == true)
+                                   || ((GetErrors(nameof(SelectedEndDate)) as IEnumerable<string>)?.Any() == true)
+                                   || ((GetErrors("TimeRange") as IEnumerable<string>)?.Any() == true);
+                return hasTimeError && (TimeTouched || SaveAttempted);
+            }
+        }
+
+        public bool IsSaveAllowed => CanSaveDraft();
+
+        public string TitleErrorMessage => ((GetErrors(nameof(Title)) as IEnumerable<string>)?.FirstOrDefault()) ?? string.Empty;
+
+        public string TimeErrorMessage
+        {
+            get
+            {
+                var tr = (GetErrors("TimeRange") as IEnumerable<string>)?.FirstOrDefault();
+                if (!string.IsNullOrEmpty(tr)) return tr;
+                var s = (GetErrors(nameof(Start)) as IEnumerable<string>)?.FirstOrDefault();
+                if (!string.IsNullOrEmpty(s)) return s;
+                var e = (GetErrors(nameof(End)) as IEnumerable<string>)?.FirstOrDefault();
+                if (!string.IsNullOrEmpty(e)) return e;
+                var sd = (GetErrors(nameof(SelectedStartDate)) as IEnumerable<string>)?.FirstOrDefault();
+                if (!string.IsNullOrEmpty(sd)) return sd;
+                var ed = (GetErrors(nameof(SelectedEndDate)) as IEnumerable<string>)?.FirstOrDefault();
+                if (!string.IsNullOrEmpty(ed)) return ed;
+                return string.Empty;
+            }
+        }
+
+        // INotifyDataErrorInfo implementation
+        public bool HasErrors => _errors.Any();
+
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+
+        public System.Collections.IEnumerable GetErrors(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName))
+                return Enumerable.Empty<string>();
+
+            if (_errors.TryGetValue(propertyName, out var errors))
+                return errors;
+
+            return Enumerable.Empty<string>();
+        }
+
+        private void AddError(string property, string message)
+        {
+            if (!_errors.ContainsKey(property))
+                _errors[property] = new List<string>();
+
+            if (!_errors[property].Contains(message))
+                _errors[property].Add(message);
+
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(property));
+            CommandManager.InvalidateRequerySuggested();
+            OnPropertyChanged(nameof(IsSaveAllowed));
+            OnPropertyChanged(nameof(ShowTitleError));
+            OnPropertyChanged(nameof(ShowTimeError));
+            OnPropertyChanged(nameof(TitleErrorMessage));
+            OnPropertyChanged(nameof(TimeErrorMessage));
+        }
+
+        private void ClearErrors(string property)
+        {
+            if (_errors.Remove(property))
+            {
+                ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(property));
+                CommandManager.InvalidateRequerySuggested();
+                OnPropertyChanged(nameof(IsSaveAllowed));
+                OnPropertyChanged(nameof(ShowTitleError));
+                OnPropertyChanged(nameof(ShowTimeError));
+                OnPropertyChanged(nameof(TitleErrorMessage));
+                OnPropertyChanged(nameof(TimeErrorMessage));
             }
         }
 
@@ -401,6 +531,84 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
 
         public AppointmentModel DraftAppointment => DraftBlock?.Appointment;
 
+        // Editor-facing properties used for binding/validation
+        public string Title
+        {
+            get => DraftBlock?.Appointment?.Title ?? string.Empty;
+            set
+            {
+                if (DraftBlock?.Appointment == null)
+                    return;
+
+                if (DraftBlock.Appointment.Title == value)
+                    return;
+
+                DraftBlock.Appointment.Title = value;
+                OnPropertyChanged(nameof(Title));
+                // validate title
+                ClearErrors(nameof(Title));
+                if (string.IsNullOrWhiteSpace(value))
+                    AddError(nameof(Title), "Title is required");
+
+                var day = DraftBlock?.Appointment?.Start.Date ?? SelectedDate;
+                UpdateDraftState(day);
+            }
+        }
+
+        public DateTime Start
+        {
+            get => DraftBlock?.Appointment?.Start ?? SelectedDate;
+            set
+            {
+                if (DraftBlock?.Appointment == null)
+                    return;
+
+                if (DraftBlock.Appointment.Start == value)
+                    return;
+
+                DraftBlock.Appointment.Start = value;
+                OnPropertyChanged(nameof(Start));
+
+                ClearErrors(nameof(Start));
+                ClearErrors(nameof(End));
+                if (DraftBlock.Appointment.Start >= DraftBlock.Appointment.End)
+                {
+                    AddError(nameof(Start), "Start must be before End");
+                    AddError(nameof(End), "End must be after Start");
+                }
+
+                var day = DraftBlock?.Appointment?.Start.Date ?? SelectedDate;
+                UpdateDraftState(day);
+            }
+        }
+
+        public DateTime End
+        {
+            get => DraftBlock?.Appointment?.End ?? SelectedDate.AddHours(1);
+            set
+            {
+                if (DraftBlock?.Appointment == null)
+                    return;
+
+                if (DraftBlock.Appointment.End == value)
+                    return;
+
+                DraftBlock.Appointment.End = value;
+                OnPropertyChanged(nameof(End));
+
+                ClearErrors(nameof(Start));
+                ClearErrors(nameof(End));
+                if (DraftBlock.Appointment.Start >= DraftBlock.Appointment.End)
+                {
+                    AddError(nameof(Start), "Start must be before End");
+                    AddError(nameof(End), "End must be after Start");
+                }
+
+                var day = DraftBlock?.Appointment?.Start.Date ?? SelectedDate;
+                UpdateDraftState(day);
+            }
+        }
+
         public Guid? DraftSourceAppointmentId
         {
             get => _draftSourceAppointmentId;
@@ -437,6 +645,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         public ICommand SaveDraftCommand { get; }
         public ICommand CreateDraftCommand { get; }
         public ICommand SaveAppointmentCommand { get; }
+        public ICommand AttemptSaveCommand { get; }
         public ICommand CancelDraftCommand { get; }
         public ICommand SelectAppointmentCommand { get; }
         public ICommand EditAppointmentCommand { get; }
@@ -490,6 +699,19 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             LoadAppointmentsCommand = new AsyncRelayCommand(LoadAppointmentsAsync);
             CreateDraftCommand = new RelayCommand(_ => CreateDraft());
             SaveDraftCommand = new AsyncRelayCommand(SaveDraftAsync, CanSaveDraft);
+            AttemptSaveCommand = new AsyncRelayCommand(async () =>
+            {
+                // Mark that the user attempted a save so validation messages become visible
+                SaveAttempted = true;
+                ValidateAll();
+                if (HasErrors)
+                {
+                    CommandManager.InvalidateRequerySuggested();
+                    return;
+                }
+
+                await SaveDraftAsync();
+            });
             SaveAppointmentCommand = SaveDraftCommand;
             CancelDraftCommand = new RelayCommand(_ => CancelDraft(), _ => DraftBlock != null);
             SelectAppointmentCommand = new RelayCommand(SelectAppointment);
@@ -649,7 +871,10 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             if (DraftBlock == null)
                 return false;
 
-            // Prefer checking the draft block directly for its validation state
+            // ViewModel-level errors take precedence
+            if (HasErrors)
+                return false;
+
             if (DraftBlock.HasValidationError)
                 return false;
 
@@ -665,6 +890,14 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
 
         private async Task SaveDraftAsync()
         {
+            // Force validation for all fields before attempting save
+            ValidateAll();
+            if (HasErrors)
+            {
+                CommandManager.InvalidateRequerySuggested();
+                return;
+            }
+
             if (!CanSaveDraft())
             {
                 return;
@@ -1041,7 +1274,6 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         {
             UpdateDraftConflictState();
             AssignAppointmentsToTimeline(day);
-            // Combine conflict state with required-field validation (title/description)
             if (DraftBlock == null || DraftBlock.Appointment == null)
             {
                 HasValidationError = false;
@@ -1050,10 +1282,40 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             }
 
             var appt = DraftBlock.Appointment;
-            var hasFieldError = string.IsNullOrWhiteSpace(appt.Title) || string.IsNullOrWhiteSpace(appt.Description);
-            var combinedError = DraftBlock.IsConflicting || hasFieldError;
-            DraftBlock.HasValidationError = combinedError;
-            HasValidationError = combinedError;
+
+            // Title required
+            ClearErrors(nameof(Title));
+            if (string.IsNullOrWhiteSpace(appt.Title))
+            {
+                AddError(nameof(Title), "Title is required");
+            }
+
+            // Time range validation (also mark selector properties so controls show errors)
+            ClearErrors(nameof(Start));
+            ClearErrors(nameof(End));
+            ClearErrors(nameof(SelectedStartDate));
+            ClearErrors(nameof(SelectedEndDate));
+            if (appt.Start >= appt.End)
+            {
+                AddError(nameof(Start), "Start must be before End");
+                AddError(nameof(End), "End must be after Start");
+                AddError(nameof(SelectedStartDate), "Start must be before End");
+                AddError(nameof(SelectedEndDate), "End must be after Start");
+            }
+
+            // Overlap validation exposed under a synthetic 'TimeRange' key
+            if (DraftBlock.IsConflicting)
+            {
+                AddError("TimeRange", "Appointment overlaps another appointment");
+            }
+            else
+            {
+                ClearErrors("TimeRange");
+            }
+
+            // Keep the draft block's validation flag tied to overlapping state
+            DraftBlock.HasValidationError = DraftBlock.IsConflicting;
+            HasValidationError = DraftBlock.HasValidationError || HasErrors;
             CommandManager.InvalidateRequerySuggested();
         }
 
@@ -1149,6 +1411,17 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             IsCreatingDraft = false;
             IsEditingDraft = false;
             SelectedListAppointment = null;
+        }
+
+        private void ValidateAll()
+        {
+            if (DraftBlock?.Appointment == null)
+                return;
+
+            // Force each validation to run by reassigning the same values
+            Title = Title;
+            Start = Start;
+            End = End;
         }
 
         private void SyncEditorDateTimeSelectors()
