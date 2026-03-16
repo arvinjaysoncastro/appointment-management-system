@@ -109,10 +109,12 @@
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\CalendarDaySummary.cs" />
     <Compile Include="Models\CalendarMonthSummary.cs" />
+    <Compile Include="Models\AppointmentDescriptionMetadata.cs" />
     <Compile Include="Enums\CalendarViewMode.cs" />
     <Compile Include="Enums\ScheduleFilter.cs" />
     <Compile Include="Services\AppointmentApiService.cs" />
     <Compile Include="Services\NavigationService.cs" />
+    <Compile Include="Helpers\DescriptionParser.cs" />
     <Compile Include="StringToVisibilityConverter.cs" />
     <Compile Include="ViewModels\AppointmentsViewModel.cs" />
     <Compile Include="ViewModels\TimelineHourViewModel.cs" />
