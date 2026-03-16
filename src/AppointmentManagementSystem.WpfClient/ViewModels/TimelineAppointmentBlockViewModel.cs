@@ -19,6 +19,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private bool _isDraft;
         private bool _isConflicting;
         private bool _showDetails;
+        private bool _hasValidationError;
         private readonly ObservableCollection<double> _timerCircleOpacities;
         private AppointmentModel _appointment;
         private bool _syncingFromAppointment;
@@ -134,6 +135,23 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             get => _isConflicting;
             set => SetProperty(ref _isConflicting, value);
         }
+
+        // Validation state exposed for the UI and other viewmodels
+        public bool HasValidationError
+        {
+            get => _hasValidationError;
+            set
+            {
+                if (_hasValidationError != value)
+                {
+                    _hasValidationError = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        // Convenience binding used by templates to mark invalid presentation
+        public bool IsInvalid => HasValidationError;
 
         public double TopOffset
         {

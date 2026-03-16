@@ -100,6 +100,10 @@
     <Compile Include="InvertBooleanToVisibilityConverter.cs" />
     <Compile Include="Models\AppointmentModel.cs" />
     <Compile Include="Models\Person.cs" />
+    <Compile Include="Models\CalendarDaySummary.cs" />
+    <Compile Include="Models\CalendarMonthSummary.cs" />
+    <Compile Include="Enums\CalendarViewMode.cs" />
+    <Compile Include="Enums\ScheduleFilter.cs" />
     <Compile Include="Services\AppointmentApiService.cs" />
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="StringToVisibilityConverter.cs" />

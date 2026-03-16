@@ -53,7 +53,8 @@
                 <Button 
                     Command="{Binding ShowSettingsCommand}"
                     Content="Settings" 
-                    Style="{StaticResource SidebarButtonStyle}"/>
+                    Style="{StaticResource SidebarButtonStyle}"
+                    Visibility="Collapsed"/>
             </StackPanel>
         </Grid>
 

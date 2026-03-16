@@ -11,40 +11,10 @@ using System.Windows.Threading;
 using AppointmentManagementSystem.WpfClient.Infrastructure;
 using AppointmentManagementSystem.WpfClient.Models;
 using AppointmentManagementSystem.WpfClient.Services;
+using AppointmentManagementSystem.WpfClient.Enums;
 
 namespace AppointmentManagementSystem.WpfClient.ViewModels
 {
-    public enum CalendarViewMode
-    {
-        Day,
-        Week,
-        Month,
-        Year
-    }
-
-    public enum ScheduleFilter
-    {
-        Today,
-        Upcoming,
-        Past
-    }
-
-    public sealed class CalendarDaySummary
-    {
-        public DateTime Date { get; set; }
-        public int AppointmentCount { get; set; }
-        public string TotalScheduledTimeText { get; set; }
-        public bool IsInCurrentMonth { get; set; }
-    }
-
-    public sealed class CalendarMonthSummary
-    {
-        public DateTime MonthStart { get; set; }
-        public string MonthName { get; set; }
-        public int AppointmentCount { get; set; }
-        public string TotalScheduledTimeText { get; set; }
-    }
-
     public sealed class AppointmentsViewModel : ViewModelBase, IAsyncInitializable
     {
         private const int MinimumDurationMinutes = 5;
@@ -87,6 +57,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private int _todayFilterCount;
         private int _upcomingFilterCount;
         private int _pastFilterCount;
+        private bool _hasValidationError;
 
         public ObservableCollection<AppointmentModel> Appointments { get; }
         public ObservableCollection<AppointmentModel> TodayAppointments { get; }
@@ -218,6 +189,20 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         {
             get => _searchFocusRequestId;
             private set => SetProperty(ref _searchFocusRequestId, value);
+        }
+
+        public bool HasValidationError
+        {
+            get => _hasValidationError;
+            private set
+            {
+                if (_hasValidationError != value)
+                {
+                    _hasValidationError = value;
+                    OnPropertyChanged();
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }
         }
 
         public ScheduleFilter SelectedFilter
@@ -408,7 +393,9 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                 OnPropertyChanged(nameof(IsDashboardMode));
                 OnPropertyChanged(nameof(IsEditorMode));
                 OnPropertyChanged(nameof(EditorDurationText));
-                CommandManager.InvalidateRequerySuggested();
+                // Ensure validation is evaluated for the newly attached draft so commands update
+                var day = _draftBlock?.Appointment?.Start.Date ?? SelectedDate;
+                UpdateDraftState(day);
             }
         }
 
@@ -447,6 +434,7 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         public string GlobalDetailsToggleText => ShowAllDescriptions ? "Hide all details" : "Show all details";
 
         public ICommand LoadAppointmentsCommand { get; }
+        public ICommand SaveDraftCommand { get; }
         public ICommand CreateDraftCommand { get; }
         public ICommand SaveAppointmentCommand { get; }
         public ICommand CancelDraftCommand { get; }
@@ -501,7 +489,8 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
 
             LoadAppointmentsCommand = new AsyncRelayCommand(LoadAppointmentsAsync);
             CreateDraftCommand = new RelayCommand(_ => CreateDraft());
-            SaveAppointmentCommand = new AsyncRelayCommand(SaveDraftAsync, () => DraftBlock != null);
+            SaveDraftCommand = new AsyncRelayCommand(SaveDraftAsync, CanSaveDraft);
+            SaveAppointmentCommand = SaveDraftCommand;
             CancelDraftCommand = new RelayCommand(_ => CancelDraft(), _ => DraftBlock != null);
             SelectAppointmentCommand = new RelayCommand(SelectAppointment);
             EditAppointmentCommand = new RelayCommand(EditAppointment, _ => SelectedListAppointment != null);
@@ -655,9 +644,28 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             RequestTimelineScrollTo(SelectedListAppointment.Start);
         }
 
-        private async Task SaveDraftAsync()
+        private bool CanSaveDraft()
         {
             if (DraftBlock == null)
+                return false;
+
+            // Prefer checking the draft block directly for its validation state
+            if (DraftBlock.HasValidationError)
+                return false;
+
+            var appt = DraftBlock.Appointment;
+            if (appt == null)
+                return false;
+
+            if (appt.Start >= appt.End)
+                return false;
+
+            return true;
+        }
+
+        private async Task SaveDraftAsync()
+        {
+            if (!CanSaveDraft())
             {
                 return;
             }
@@ -678,9 +686,18 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                 ClearDraftState();
                 await LoadAppointmentsAsync();
             }
+            //catch (AppointmentManagementSystem.Domain.Exceptions.DomainException dex)
+            //{
+            //    // Domain exceptions (e.g. appointment overlap) should be presented to the user
+            //    MessageBox.Show(dex.Message, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            //    // Keep the draft open so the user can correct it; ensure commands re-evaluate
+            //    CommandManager.InvalidateRequerySuggested();
+            //}
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to save appointment. {ex.Message}", "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CommandManager.InvalidateRequerySuggested();
+
             }
         }
 
@@ -1015,13 +1032,28 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                 draft.Start < existing.End &&
                 draft.End > existing.Start);
 
+            // Mark conflicting state and expose validation error so UI and commands can react
             DraftBlock.IsConflicting = hasConflict;
+            CommandManager.InvalidateRequerySuggested();
         }
 
         private void UpdateDraftState(DateTime day)
         {
             UpdateDraftConflictState();
             AssignAppointmentsToTimeline(day);
+            // Combine conflict state with required-field validation (title/description)
+            if (DraftBlock == null || DraftBlock.Appointment == null)
+            {
+                HasValidationError = false;
+                CommandManager.InvalidateRequerySuggested();
+                return;
+            }
+
+            var appt = DraftBlock.Appointment;
+            var hasFieldError = string.IsNullOrWhiteSpace(appt.Title) || string.IsNullOrWhiteSpace(appt.Description);
+            var combinedError = DraftBlock.IsConflicting || hasFieldError;
+            DraftBlock.HasValidationError = combinedError;
+            HasValidationError = combinedError;
             CommandManager.InvalidateRequerySuggested();
         }
 
@@ -1091,6 +1123,22 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
                 OnPropertyChanged(nameof(EditorDurationText));
                 var day = DraftBlock?.Appointment?.Start.Date ?? SelectedDate;
                 UpdateDraftState(day);
+                return;
+            }
+
+            if (e.PropertyName == nameof(TimelineAppointmentBlockViewModel.HasValidationError))
+            {
+                HasValidationError = DraftBlock?.HasValidationError ?? false;
+                return;
+            }
+
+            // Re-evaluate validation when title or description change so commands update
+            if (e.PropertyName == nameof(TimelineAppointmentBlockViewModel.Title) ||
+                e.PropertyName == nameof(TimelineAppointmentBlockViewModel.Description))
+            {
+                var day = DraftBlock?.Appointment?.Start.Date ?? SelectedDate;
+                UpdateDraftState(day);
+                return;
             }
         }
 
