@@ -12,6 +12,7 @@ using AppointmentManagementSystem.WpfClient.Infrastructure;
 using AppointmentManagementSystem.WpfClient.Models;
 using AppointmentManagementSystem.WpfClient.Services;
 using AppointmentManagementSystem.WpfClient.Enums;
+using AppointmentManagementSystem.WpfClient.Helpers;
 
 namespace AppointmentManagementSystem.WpfClient.ViewModels
 {
@@ -67,12 +68,17 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
         private bool _titleTouched;
         private bool _timeTouched;
         private bool _saveAttempted;
+        private string _descriptionText = string.Empty;
+        private string _priority = string.Empty;
+        private string _status = string.Empty;
 
         public ObservableCollection<AppointmentModel> Appointments { get; }
         public ObservableCollection<AppointmentModel> TodayAppointments { get; }
         public ObservableCollection<TimelineHourViewModel> TimelineHours { get; }
         public ObservableCollection<TimelineAppointmentBlockViewModel> TimelineBlocks { get; }
         public ObservableCollection<string> TimeOptions { get; }
+        public IReadOnlyList<string> PriorityOptions { get; }
+        public IReadOnlyList<string> StatusOptions { get; }
         public ObservableCollection<CalendarDaySummary> WeekDaySummaries { get; }
         public ObservableCollection<CalendarDaySummary> MonthDaySummaries { get; }
         public ObservableCollection<CalendarMonthSummary> YearMonthSummaries { get; }
@@ -641,6 +647,48 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             }
         }
 
+        // Description metadata exposed to the editor. The raw appointment.Description
+        // is parsed into this model when a draft loads and is serialized back on save.
+        public string DescriptionText
+        {
+            get => _descriptionText;
+            set
+            {
+                if (SetProperty(ref _descriptionText, value))
+                {
+                    // mark draft dirty / revalidate
+                    var day = DraftBlock?.Appointment?.Start.Date ?? SelectedDate;
+                    UpdateDraftState(day);
+                }
+            }
+        }
+
+        public string Priority
+        {
+            get => _priority;
+            set
+            {
+                if (SetProperty(ref _priority, value))
+                {
+                    var day = DraftBlock?.Appointment?.Start.Date ?? SelectedDate;
+                    UpdateDraftState(day);
+                }
+            }
+        }
+
+        public string Status
+        {
+            get => _status;
+            set
+            {
+                if (SetProperty(ref _status, value))
+                {
+                    var day = DraftBlock?.Appointment?.Start.Date ?? SelectedDate;
+                    UpdateDraftState(day);
+                }
+            }
+        }
+
         public Guid? DraftSourceAppointmentId
         {
             get => _draftSourceAppointmentId;
@@ -721,6 +769,8 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             TimelineHours = new ObservableCollection<TimelineHourViewModel>();
             TimelineBlocks = new ObservableCollection<TimelineAppointmentBlockViewModel>();
             TimeOptions = new ObservableCollection<string>(BuildTimeOptions());
+            PriorityOptions = new[] { "Low", "Medium", "High" };
+            StatusOptions = new[] { "Scheduled", "Tentative", "Completed", "Cancelled" };
             WeekDaySummaries = new ObservableCollection<CalendarDaySummary>();
             MonthDaySummaries = new ObservableCollection<CalendarDaySummary>();
             YearMonthSummaries = new ObservableCollection<CalendarMonthSummary>();
@@ -812,7 +862,10 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to load appointments. {ex.Message}", "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Show detailed exception information to help diagnose intermittent network/API issues.
+                var baseEx = ex.GetBaseException();
+                var details = $"Failed to load appointments.\n\nMessage: {ex.Message}\nBase: {baseEx.Message}\n\nDetails:\n{ex}";
+                MessageBox.Show(details, "API Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -950,6 +1003,22 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
 
             try
             {
+                // Ensure the appointment.Description contains the serialized metadata
+                try
+                {
+                    DraftBlock.Appointment.Description = DescriptionParser.Serialize(new AppointmentDescriptionMetadata
+                    {
+                        DescriptionText = DescriptionText,
+                        Priority = Priority,
+                        Status = Status
+                    });
+                }
+                catch
+                {
+                    // Fallback: keep raw description text if serialization fails
+                    DraftBlock.Appointment.Description = DescriptionText ?? string.Empty;
+                }
+
                 var payload = Clone(DraftBlock.Appointment);
 
                 if (DraftSourceAppointmentId.HasValue)
@@ -1293,6 +1362,20 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             }
 
             block.PropertyChanged += OnDraftBlockPropertyChanged;
+            // Parse description metadata into editor-facing properties
+            try
+            {
+                var meta = DescriptionParser.Parse(block.Appointment?.Description ?? string.Empty);
+                DescriptionText = meta.DescriptionText ?? string.Empty;
+                Priority = meta.Priority ?? string.Empty;
+                Status = meta.Status ?? string.Empty;
+            }
+            catch
+            {
+                DescriptionText = block.Appointment?.Description ?? string.Empty;
+                Priority = string.Empty;
+                Status = string.Empty;
+            }
         }
 
         private void DetachDraftBlock(TimelineAppointmentBlockViewModel block)
@@ -1340,6 +1423,10 @@ namespace AppointmentManagementSystem.WpfClient.ViewModels
             IsCreatingDraft = false;
             IsEditingDraft = false;
             SelectedListAppointment = null;
+            // clear editor metadata state
+            DescriptionText = string.Empty;
+            Priority = null;
+            Status = null;
         }
 
         private void ValidateAll()

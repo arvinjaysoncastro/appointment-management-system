@@ -591,11 +591,28 @@
                 <TextBlock Margin="0,0,0,4">
                     <Run Text="Description" />
                 </TextBlock>
-                <TextBox Text="{Binding DraftBlock.Appointment.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                <TextBox Text="{Binding DescriptionText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          AcceptsReturn="True"
                          Height="72"
                          TextWrapping="Wrap"
                          Margin="0,6,0,12" />
+
+                <!-- Priority & Status metadata selectors -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,12,0">
+                        <TextBlock Text="Priority" Margin="0,0,6,0" VerticalAlignment="Center" />
+                        <ComboBox Width="120"
+                                  ItemsSource="{Binding PriorityOptions}"
+                                  SelectedItem="{Binding Priority, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Status" Margin="0,0,6,0" VerticalAlignment="Center" />
+                        <ComboBox Width="140"
+                                  ItemsSource="{Binding StatusOptions}"
+                                  SelectedItem="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </StackPanel>
 
                 <TextBlock Text="Time" Margin="0,0,0,4" FontWeight="SemiBold" Foreground="#334155" />
                 <Grid Margin="0,6,0,12">
